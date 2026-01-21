@@ -25,6 +25,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="#pricing">Pricing</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#questions">Questions</a>
+                        </li>
                     </ul>
                     <div class="d-flex align-items-center gap-3">
                         <a href="#" class="nav-link fw-semibold">Log In</a>
@@ -237,6 +240,45 @@
                                     <p class="text-muted small mb-0">CTO at SecureData</p>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Questions Section -->
+        <section id="questions" class="recent-questions-section py-5 bg-light-soft">
+            <div class="container px-4 text-center">
+                <h2 class="display-5 fw-bold mb-3">Recent Questions</h2>
+                <p class="text-muted mb-5">Frequently asked questions from our community</p>
+
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="question-card">
+                            <h5 class="fw-bold mb-3">How do I join a community?</h5>
+                            <p class="text-muted">Simply search for communities that interest you and click the join
+                                button. You can join up to 5 communities on the free plan.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="question-card">
+                            <h5 class="fw-bold mb-3">Is my data secure?</h5>
+                            <p class="text-muted">Yes, we use advanced encryption and privacy controls to keep your data
+                                safe. Your information is never shared without your consent.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="question-card">
+                            <h5 class="fw-bold mb-3">Can I create my own community?</h5>
+                            <p class="text-muted">Absolutely! With a Pro or Enterprise plan, you can create and manage
+                                your own communities with unlimited members.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="question-card">
+                            <h5 class="fw-bold mb-3">How does real-time chat work?</h5>
+                            <p class="text-muted">Our chat system connects you instantly with other members. Messages
+                                are delivered in real-time with support for text, images, and files.</p>
                         </div>
                     </div>
                 </div>
@@ -654,6 +696,21 @@ onUnmounted(() => {
     border-radius: 50px;
     font-size: 0.75rem;
     font-weight: 800;
+}
+
+.question-card {
+    padding: 2.5rem;
+    background: white;
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    height: 100%;
+    text-align: left;
+    transition: transform 0.3s ease;
+}
+
+.question-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
 html {
