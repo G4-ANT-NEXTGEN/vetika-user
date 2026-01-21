@@ -23,15 +23,15 @@
                             <a class="nav-link" href="#customers">Customers</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#pricing">Pricing</a>
+                            <a class="nav-link" href="#questions">Questions</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#questions">Questions</a>
+                            <a class="nav-link" href="#pricing">Pricing</a>
                         </li>
                     </ul>
                     <div class="d-flex align-items-center gap-3">
-                        <a href="#" class="nav-link fw-semibold">Log In</a>
-                        <button class="btn btn-dark px-4 py-2 rounded-3 fw-semibold">Sign Up Free</button>
+                        <button class="btn px-4 py-2 rounded-3 fw-semibold">Log In</button>
+                        <button class="btn px-4 py-2 rounded-3 fw-semibold">Sign Up Free</button>
                     </div>
                 </div>
             </div>
@@ -500,6 +500,10 @@ onUnmounted(() => {
     color: #fff !important;
 }
 
+.custom-navbar.scrolled .nav-link:hover {
+    border-bottom: 2px solid #fff;
+}
+
 .custom-navbar.scrolled .navbar-brand {
     color: #fff !important;
 }
@@ -511,9 +515,33 @@ onUnmounted(() => {
 .nav-link {
     color: #1f2937 !important;
     font-weight: 500;
+    border-bottom: 2px solid transparent;
+    transition: border-bottom 0.3s ease;
 }
 
 .nav-link:hover {
+    color: #000;
+    border-bottom: 2px solid #000;
+}
+
+.custom-navbar .btn {
+    background: transparent;
+    border: none;
+    color: #1f2937;
+    font-weight: 600;
+}
+
+.custom-navbar .btn:hover {
+    background: #000;
+    color: #fff;
+}
+
+.custom-navbar.scrolled .btn {
+    color: #fff;
+}
+
+.custom-navbar.scrolled .btn:hover {
+    background: #fff;
     color: #000;
 }
 
