@@ -14,11 +14,21 @@ import Step1CreateUserView from '@/views/register/Step1CreateUserView.vue'
 import Step2TypeUserView from '@/views/register/Step2TypeUserView.vue'
 import Step3PositionUserView from '@/views/register/Step3PositionUserView.vue'
 import Step4PreviewUserView from '@/views/register/Step4PreviewUserView.vue'
+import LandingView from '@/views/LandingView.vue'
 
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/landing',
+      name: 'landing',
+      component: LandingView,
+      meta: {
+        title: 'Landing',
+        requiresAuth: false
+      }
+    },
     {
       path: '/',
       name: 'login',
