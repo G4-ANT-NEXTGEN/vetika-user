@@ -39,6 +39,14 @@ export const useChatStore = defineStore('chat', () => {
 
   }
 
+  const sendMessage= async (payload) => {
+    try{
+      const res = await api.post(`/api/messages`,payload);
+    }
+    catch(e){
+      console.log("Error in sending message", e);
+    }
+  }
   const chatList = computed(() => {
     const map = new Map()
 
@@ -68,6 +76,7 @@ export const useChatStore = defineStore('chat', () => {
     getOwnMessages,
     getReceivedMessages,
     fetchReceivedChats,
+    sendMessage,
     chatList
   }
 })
