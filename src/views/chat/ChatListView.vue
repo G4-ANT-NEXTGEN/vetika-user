@@ -4,7 +4,7 @@
       <div class="col-3">
         <div class="chat-list">
           <div class="chat" v-for="chat in chatStore.chatList" :key="chat.id">
-            <base-button class="text-start" type="button" variant="white" @click="selectChat(chat.receiver.id)">
+            <base-button class="text-start" type="button" variant="white" @click="selectChat(chat.messages[0].isMine ? chat.receiver.id : chat.sender.id)">
               <div class="d-flex align-items-center">
                 <img :src="chat.messages[0].isMine ? chat.receiver.avatar : chat.sender.avatar" class="rounded-5 me-2" width="60" height="60" alt="">
                 <div>
@@ -22,13 +22,17 @@
         <div v-if="isSelectChat" class="main-content">
           <div class="receiver-name">
             <div class="d-flex align-items-center h-100 px-3">
-              <img class="rounded-5 me-2" :src="chatStore.getConversationMessages(receiverId)[0].receiver.avatar" alt="" width="60" height="60">
-              <h4 class="m-0">{{ chatStore.getConversationMessages(receiverId)[0].receiver.full_name }}</h4>
+              <img class="rounded-5 me-2" :src="chatStore.getConversationMessages(receiverId)[0].isMine ? chatStore.getConversationMessages(receiverId)[0].receiver.avatar : chatStore.getConversationMessages(receiverId)[0].sender.avatar" alt="" width="60" height="60">
+              <h4 class="m-0">{{ chatStore.getConversationMessages(receiverId)[0].isMine ? chatStore.getConversationMessages(receiverId)[0].receiver.full_name : chatStore.getConversationMessages(receiverId)[0].sender.full_name }}</h4>
             </div>
           </div>
           <div class="px-3 pt-5">
             <div v-for="receive in chatStore.getConversationMessages(receiverId)" :key="receive.id">
-              <p class="receive-message" v-if="!receive.isMine">{{ receive.message }}</p>
+              <div v-if="!receive.isMine">
+
+                <img class="bg-danger rounded-5 me-2" :src="chatStore.getConversationMessages(receiverId)[0].isMine ? chatStore.getConversationMessages(receiverId)[0].receiver.avatar : chatStore.getConversationMessages(receiverId)[0].sender.avatar"" alt="" width="30" height="30">
+                <p class="receive-message">{{ receive.message }}</p>
+              </div>
               <div class="text-end" v-else>
                 <p class="send-message">{{ receive.message }}</p>
               </div>
