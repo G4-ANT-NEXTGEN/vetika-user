@@ -14,7 +14,7 @@ import 'tom-select/dist/css/tom-select.css'
 
 import BaseButton from './components/ui/base/BaseButton.vue';
 import BaseInput from './components/ui/base/BaseInput.vue';
-import BaseToast from "./components/ui/base/BaseToast.vue";
+// import BaseToast from "./components/ui/base/BaseToast.vue";
 import BaseModal from "./components/ui/base/BaseModal.vue";
 import BaseSelect from "./components/ui/base/BaseSelect.vue";
 
@@ -28,7 +28,7 @@ app.use(router)
 
 app.component('BaseButton', BaseButton)
 app.component('BaseInput', BaseInput)
-app.component('BaseToast', BaseToast)
+// app.component('BaseToast', BaseToast)
 app.component('BaseModal', BaseModal)
 app.component('BaseSelect', BaseSelect)
 
