@@ -38,34 +38,67 @@ const emit = defineEmits(['close'])
 const close = () => emit('close')
 
 const sizeClass = computed(() => (props.size ? `modal-${props.size}` : ''))
-
 </script>
 
-<style scoped>
-
-
+<style>
+/* Modal body */
 .modal-body {
   max-height: calc(100vh - 250px);
   overflow-y: auto;
   overflow-x: hidden;
+  color: var(--color-text);
+  background: var(--color-accent);
 }
 
-/* Optional: Add scrollbar styling for better appearance */
+/* Modal content */
+.modal-content {
+  background: var(--color-accent);
+  color: var(--color-text);
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+}
+
+/* Header */
+.modal-header {
+  border-bottom: 1px solid var(--border-color);
+  background: var(--color-accent);
+}
+
+.modal-title {
+  color: var(--color-text);
+}
+
+/* Footer */
+.modal-footer {
+  border-top: 1px solid var(--border-color);
+  background: var(--color-accent);
+}
+
+/* Close button (Bootstrap override-safe) */
+.btn-close {
+  filter: invert(0);
+}
+
+[data-theme='dark'] .btn-close {
+  filter: invert(1);
+}
+
+/* Scrollbar styling */
 .modal-body::-webkit-scrollbar {
   width: 8px;
 }
 
 .modal-body::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--color-secondary);
   border-radius: 4px;
 }
 
 .modal-body::-webkit-scrollbar-thumb {
-  background: #888;
+  background: var(--color-muted);
   border-radius: 4px;
 }
 
 .modal-body::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: var(--color-gray);
 }
 </style>
