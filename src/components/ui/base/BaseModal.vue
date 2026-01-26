@@ -32,7 +32,6 @@ const emit = defineEmits(['close'])
 const close = () => emit('close')
 
 const sizeClass = computed(() => (props.size ? `modal-${props.size}` : ''))
-
 </script>
 
 <style scoped>
@@ -69,19 +68,19 @@ const sizeClass = computed(() => (props.size ? `modal-${props.size}` : ''))
   color: var(--color-secondary);
 }
 
-/* Optional: Add scrollbar styling for better appearance */
+/* Scrollbar styling */
 .modal-body::-webkit-scrollbar {
   width: 8px;
   display: none;
 }
 
 .modal-body::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--color-secondary);
   border-radius: 4px;
 }
 
 .modal-body::-webkit-scrollbar-thumb {
-  background: #888;
+  background: var(--color-muted);
   border-radius: 4px;
 }
 
