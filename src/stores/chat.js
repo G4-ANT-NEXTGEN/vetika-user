@@ -5,7 +5,8 @@ import api from '@/api/api';
 export const useChatStore = defineStore('chat', () => {
   const chats = ref([]);
   const receivedChats = ref([]);
-  const isSelectChat = ref(true)
+  const isSelectChat = ref(false)
+  const isLoading = ref(false);
 
   //own messages
   const fetchChats = async () => {
@@ -17,16 +18,19 @@ export const useChatStore = defineStore('chat', () => {
     catch (e) {
       console.log("Error in fetching chat list", e);
     }
+
   }
   //received messages
   const fetchReceivedChats = async () => {
     try {
+
       const res = await api.get(`/api/profile/received-messages`);
       receivedChats.value = res.data.data;
     }
     catch (e) {
       console.log("Error in fetching received chat list", e);
     }
+
   }
   // get messages for a specific conversation by sender/receiver id
   const getConversationMessages = (chatId) => {
@@ -50,25 +54,21 @@ export const useChatStore = defineStore('chat', () => {
   }
   const getAllConversationMessages = () => {
     const sent = chats.value
-      // .filter(chat => chat.receiver.id === chatId)
       .map(chat => ({
         ...chat,
-        // isMine: true
       }))
 
     const received = receivedChats.value
-      // .filter(chat => chat.sender.id === chatId)
       .map(chat => ({
         ...chat,
-
       }))
-
     return [...sent, ...received]
   }
 
 
   const sendMessage = async (payload) => {
     try {
+      isLoading.value = true;
       const res = await api.post(`/api/messages`, payload);
       await fetchChats();
       await fetchReceivedChats();
@@ -77,12 +77,15 @@ export const useChatStore = defineStore('chat', () => {
     catch (e) {
       console.log("Error in sending message", e);
     }
+    finally{
+      isLoading.value = false;
+    }
   }
   const chatList = computed(() => {
     const map = new Map()
     // you messages
     chats.value.forEach(chat => {
-      if (!chat.receiver) return   // ✅ safety
+      if (!chat.receiver) return
 
       const uid = chat.receiver.id
 
@@ -131,6 +134,8 @@ export const useChatStore = defineStore('chat', () => {
     getConversationMessages,
     chatList,
     getAllConversationMessages,
-    isSelectChat
+    isSelectChat,
+    isLoading
+
   }
 })
