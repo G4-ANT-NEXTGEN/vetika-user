@@ -2,31 +2,18 @@
   <div class="chat-section container-fluid">
     <div class="row">
       <div class="">
-
         <div v-if="isLoading">
-          <!-- Messages Sidebar Skeleton -->
           <div class="p-3">
-
-            <!-- Title -->
             <div class="skeleton skeleton-text mb-3" style="width:120px;height:22px;"></div>
-
-            <!-- Search -->
             <div class="skeleton mb-4" style="height:45px;border-radius:12px;"></div>
-
-            <!-- Conversation rows -->
             <div v-for="i in 4" :key="i" class="d-flex align-items-center mb-3 p-2">
-              <!-- Avatar -->
               <div class="skeleton skeleton-circle me-3" style="width:48px;height:48px;"></div>
-
-              <!-- Text -->
               <div class="flex-grow-1">
                 <div class="skeleton skeleton-text mb-2" style="width:60%;"></div>
                 <div class="skeleton skeleton-small" style="width:40%;"></div>
               </div>
             </div>
-
           </div>
-
           <div class="d-flex align-items-center p-3" v-for="i in 4" :key="i">
             <div class="skeleton skeleton-circle me-3" style="width:50px;height:50px;"></div>
             <div class="flex-grow-1">
@@ -36,27 +23,27 @@
           </div>
         </div>
         <div v-else class="chat-list">
-
           <div class="search-chat p-3 pb-1">
             <div class="d-flex justify-content-between align-items-center">
               <h4 style="color:var(--color-dark)">Messages</h4>
-               <button @click="toggleTheme" class="theme-btn">
-                        <i v-if="theme === 'light'" class="bi bi-moon-fill icon-btn"></i>
-                        <i v-else class="bi bi-brightness-high-fill icon-btn"></i>
-                    </button>
+              <button @click="toggleTheme" class="theme-btn">
+                <i v-if="theme === 'light'" class="bi bi-moon-fill icon-btn"></i>
+                <i v-else class="bi bi-brightness-high-fill icon-btn"></i>
+              </button>
             </div>
             <base-input class="w-100 pt-3" placeholder="Search Conversation..."></base-input>
           </div>
           <hr class="my-1" />
           <div class="chat" v-for="chat in chatStore.chatList" :key="chat.id">
-            <router-link class="text-start conversationer text-decoration-none" @click="chatStore.isSelectChat = true"
+            <router-link class="text-start conversationer text-decoration-none" @click="isSelectChat(true)"
               :to="{ name: 'chat-room', params: { id: chat.messages[0].isMine ? chat.messages[0].receiver.id : chat.messages[0].sender.id } }"
               type="button" variant="white">
               <div class="d-flex align-items-center">
                 <img :src="chat.messages[0].isMine ? chat.messages[0].receiver.avatar : chat.messages[0].sender.avatar"
                   class="rounded-5 me-2" width="60" height="60" alt="">
                 <div>
-                  <p class="mb-0 fw-bold" style="color:var(--color-dark)">{{ chat.messages[0].isMine ? chat.messages[0].receiver.full_name :
+                  <p class="mb-0 fw-bold" style="color:var(--color-dark)">{{ chat.messages[0].isMine ?
+                    chat.messages[0].receiver.full_name :
                     chat.messages[0].sender.full_name }}
                   </p>
                   <div class="message">
@@ -68,7 +55,6 @@
                 </div>
               </div>
             </router-link>
-
           </div>
         </div>
       </div>
@@ -81,12 +67,14 @@ import { onMounted, ref } from 'vue'
 import { useChatStore } from '@/stores/chat'
 import { useTheme } from '@/composables/useTheme'
 
-const { theme, toggleTheme} = useTheme();
-
-// chatStore.isSelectChat = false
+const { theme, toggleTheme } = useTheme();
 const chatStore = useChatStore()
 const isLoading = ref(false);
-// console.log()
+localStorage.setItem('chatSelect', false);
+const isSelectChat = (chatSelect) => {
+
+  localStorage.setItem('chatSelect', chatSelect);
+}
 onMounted(async () => {
   chatStore.isSelectChat = false;
   try {
@@ -117,9 +105,11 @@ onMounted(async () => {
   border-radius: 10px;
   width: 100%;
 }
-.search-chat{
-  color:var(--color-dark)
+
+.search-chat {
+  color: var(--color-dark)
 }
+
 .chat {
   transition: all 0.5s;
   width: 100%;
@@ -142,7 +132,6 @@ onMounted(async () => {
   background-color: var(--color-gray);
   color: var(--color-text);
   border-radius: 10px;
-  /* border-left: 4px solid #4f46e5; */
   font-weight: 600;
 }
 
@@ -187,6 +176,7 @@ onMounted(async () => {
 .skeleton-small {
   height: 10px;
 }
+
 .theme-btn {
   border: 1px solid var(--border-color);
   background: var(--color-secondary);
@@ -197,5 +187,4 @@ onMounted(async () => {
   border: none;
   cursor: pointer;
 }
-
 </style>

@@ -6,8 +6,6 @@
         <ChatListView />
       </div>
       <div class="col-9">
-
-
         <div v-if="!chatStore.isSelectChat" class="main-content d-flex justify-content-center align-items-center"
           style="height:100vh">
           <h3>Start message now...</h3>

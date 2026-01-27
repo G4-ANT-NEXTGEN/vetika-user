@@ -54,19 +54,14 @@ export const useChatStore = defineStore('chat', () => {
   }
   const getAllConversationMessages = () => {
     const sent = chats.value
-      // .filter(chat => chat.receiver.id === chatId)
       .map(chat => ({
         ...chat,
-        // isMine: true
       }))
 
     const received = receivedChats.value
-      // .filter(chat => chat.sender.id === chatId)
       .map(chat => ({
         ...chat,
-
       }))
-
     return [...sent, ...received]
   }
 
@@ -90,7 +85,7 @@ export const useChatStore = defineStore('chat', () => {
     const map = new Map()
     // you messages
     chats.value.forEach(chat => {
-      if (!chat.receiver) return   // ✅ safety
+      if (!chat.receiver) return
 
       const uid = chat.receiver.id
 
