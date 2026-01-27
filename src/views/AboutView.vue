@@ -31,7 +31,12 @@
             </p>
             <div class="d-flex gap-3 reveal-scroll reveal-up" style="transition-delay: 0.2s">
               <button class="btn btn-light px-4 py-2 fw-semibold">Start Next Gen</button>
-              <button class="btn btn-outline-light px-4 py-2 fw-semibold">Watch Demo</button>
+              <RouterLink
+                to="http://antstudents.com/ScholarshipBatch2/hcb/g10/index.html"
+                target="_blank"
+                class="btn btn-outline-light px-4 py-2 fw-semibold"
+                >Watch Demo</RouterLink
+              >
             </div>
           </div>
           <div class="col-lg-6">
