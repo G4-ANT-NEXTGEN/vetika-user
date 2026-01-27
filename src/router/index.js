@@ -18,7 +18,7 @@ import LandingView from '@/views/LandingView.vue'
 import AboutView from '@/views/AboutView.vue'
 import EventsView from '@/views/EventsView.vue'
 import HelpView from '@/views/HelpView.vue'
-
+import FeedView from '@/views/feed/FeedView.vue'
 import ProfileDetailView from '@/views/profile/ProfileDetailView.vue'
 
 import ChatLayout from '@/layout/ChatLayout.vue'
@@ -39,31 +39,35 @@ const router = createRouter({
       },
     },
     {
-      path: '/about',
-      name: 'about',
-      component: AboutView,
-      meta: {
-        title: 'About',
-        requiresAuth: false,
-      },
-    },
-    {
-      path: '/events',
-      name: 'events',
-      component: EventsView,
-      meta: {
-        title: 'Events',
-        requiresAuth: true,
-      },
-    },
-    {
-      path: '/help',
-      name: 'help',
-      component: HelpView,
-      meta: {
-        title: 'Help',
-        requiresAuth: false,
-      },
+      path: '/home',
+      component: HomeView,
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: '',
+          name: 'home',
+          component: FeedView,
+          meta: { title: 'Feed' }
+        },
+        {
+          path: '/about',
+          name: 'about',
+          component: AboutView,
+          meta: { title: 'About' }
+        },
+        {
+          path: '/events',
+          name: 'events',
+          component: EventsView,
+          meta: { title: 'Events' }
+        },
+        {
+          path: '/home/help',
+          name: 'help',
+          component: HelpView,
+          meta: { title: 'Help' }
+        }
+      ]
     },
     {
       path: '/',
@@ -126,15 +130,6 @@ const router = createRouter({
           }
         }
       ]
-    },
-    {
-      path: '/home',
-      name: 'home',
-      component: HomeView,
-      meta: {
-        title: 'Home',
-        requiresAuth: true,
-      },
     },
     {
       path: '/profile',
