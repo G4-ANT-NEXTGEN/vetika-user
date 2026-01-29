@@ -50,7 +50,7 @@
     </div>
 
     <!-- Modals -->
-    <BaseModal v-if="showModal" title="Create Post" size="lg" @close="showModal = false">
+    <BaseModal v-if="showModal" :title="PostId ? 'Edit Post' : 'Create Post'" size="lg" @close="closeModal">
       <div class="p-2">
         <!-- BODY -->
         <div class=" d-flex align-items-center gap-3 mb-4">
@@ -107,8 +107,8 @@
       <!-- FOOTER -->
       <template #footer>
         <div class="group-btn-modal d-flex justify-content-end gap-3 align-items-center">
-          <BaseButton variant="primary" @click="publishPost" :disabled="isLoading">
-            Publish
+          <BaseButton variant="primary" @click="publishPost" :disabled="isLoading" :isLoading="isLoading">
+            {{ PostId ? 'Update' : 'Publish' }}
           </BaseButton>
         </div>
       </template>
@@ -120,7 +120,7 @@
       </div>
       <template #footer>
         <div class="group-btn-modal d-flex justify-content-end gap-3 align-items-center">
-          <BaseButton variant="primary" @click="deletePost" :disabled="isLoading">
+          <BaseButton variant="primary" @click="deletePost" :disabled="isLoading" :isLoading="isLoading">
             Delete
           </BaseButton>
         </div>
@@ -210,7 +210,7 @@ const OpenModeledit = async () => {
     if (!post) return;
 
     titlePost.value = post.text || '';
-    const isDefaultPath = post.image === 'http://novia.csm.linkpc.net/storage/posts';
+    const isDefaultPath = post.image === 'http://novia2.csm.linkpc.net/storage/posts';
     file.value = isDefaultPath ? null : (post.image || null);
     imgPost.value = isDefaultPath ? null : (post.image || null);
     attachment.value = null;
@@ -222,7 +222,7 @@ const OpenModeledit = async () => {
       selected.value = null;
     }
     errorTitle.value = null;
-    openCreatePostModal();
+    showModal.value = true; // Open modal directly without resetting PostId
   } catch (error) {
     console.error('Error loading post for edit:', error);
   }
@@ -248,7 +248,25 @@ const handleAttachmentChange = (event) => {
 };
 
 const openCreatePostModal = () => {
+  PostId.value = null; // Reset PostId when creating new post
+  titlePost.value = '';
+  file.value = null;
+  imgPost.value = null;
+  attachment.value = null;
+  selected.value = null;
+  errorTitle.value = null;
   showModal.value = true;
+};
+
+const closeModal = () => {
+  showModal.value = false;
+  PostId.value = null; // Reset PostId when closing modal
+  titlePost.value = '';
+  file.value = null;
+  imgPost.value = null;
+  attachment.value = null;
+  selected.value = null;
+  errorTitle.value = null;
 };
 
 const removeImage = () => {
@@ -317,14 +335,16 @@ const publishPost = async () => {
       return;
     }
     const data = prepareFormData();
-    await postStore.createPost(data);
-    showModal.value = false;
-    titlePost.value = '';
-    file.value = null;
-    attachment.value = null;
-    selected.value = null;
-    imgPost.value = null;
-    errorTitle.value = null;
+
+    if (PostId.value) {
+      // Update existing post
+      await postStore.updatePost(PostId.value, data);
+    } else {
+      // Create new post
+      await postStore.createPost(data);
+    }
+
+    closeModal();
     await postStore.fetchPosts();
   } catch (error) {
     console.error('Error publishing post:', error);

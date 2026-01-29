@@ -96,11 +96,23 @@ export const usePostStore = defineStore('post', () => {
 
   const updatePost = async (id, payload) => {
     try {
-      const response = await api.put(`/api/posts/${id}`, payload)
-      showSuccess('Post updated successfully')
-      return response.data.data
+      if (payload instanceof FormData) {
+        payload.append('_method', 'PUT');
+        const response = await api.post(`/api/posts/${id}`, payload, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        showSuccess('Post updated successfully');
+        return response.data.data;
+      } else {
+        const response = await api.put(`/api/posts/${id}`, payload);
+        showSuccess('Post updated successfully');
+        return response.data.data;
+      }
     } catch (err) {
-      showError('Failed to update post')
+      console.log(err.response?.data);
+      showError('Failed to update post');
     }
   }
 
@@ -110,7 +122,8 @@ export const usePostStore = defineStore('post', () => {
       showSuccess('Post deleted successfully')
       await fetchPosts()
     } catch (err) {
-      showError('Failed to delete post')
+      console.log(err.response?.data);
+      showError('Failed to delete post');
     }
   }
 

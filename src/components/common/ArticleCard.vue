@@ -3,11 +3,11 @@
     <!-- Header Section -->
     <header class="post-header">
       <div class="author-info">
-        <div class="avatar-wrapper">
+        <div class="avatar-wrapper" @click="handleAvatarClick">
           <img class="avatar-image" :src="post.creator.avatar" :alt="post.creator.full_name">
         </div>
         <div class="author-details">
-          <h3 class="author-name">{{ post.creator.full_name }}</h3>
+          <h3 class="author-name" @click="handleAvatarClick">{{ post.creator.full_name }}</h3>
           <div class="post-meta">
             <i class="bi bi-globe-americas"></i>
             <time class="post-date">{{ formatDate(post.created_at) }}</time>
@@ -49,7 +49,7 @@
     </div>
 
     <!-- Image Section -->
-    <div class="post-media" v-if="post.image && post.image !== 'http://novia.csm.linkpc.net/storage/posts'">
+    <div class="post-media" v-if="post.image && post.image !== 'http://novia2.csm.linkpc.net/storage/posts'">
       <div class="media-container">
         <img class="media-image" :src="post.image" alt="Post image">
       </div>
@@ -87,9 +87,10 @@
 </template>
 
 <script setup>
+import router from '@/router';
 import moment from 'moment-timezone';
 
-defineProps({
+const props = defineProps({
   post: {
     type: Object,
     required: true
@@ -108,11 +109,18 @@ defineProps({
   }
 });
 
-defineEmits(['edit', 'delete', 'like', 'get-id', 'pin', 'report', 'hide']);
+defineEmits(['edit', 'delete', 'like', 'get-id', 'hide']);
 
 const formatDate = (date) => {
   return moment.utc(date).local().fromNow();
 }
+
+const handleAvatarClick = () => {
+  // alert(props.post.creator.id)
+  router.push({ name: 'profileuser', params: { id: props.post.creator.id } });
+}
+
+
 </script>
 
 <style scoped>
@@ -172,6 +180,7 @@ const formatDate = (date) => {
 
 .avatar-wrapper:hover {
   /* transform: scale(1.05); */
+  cursor: pointer;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
@@ -192,6 +201,10 @@ const formatDate = (date) => {
   color: var(--color-text, #1a1a1a);
   margin: 0 0 4px 0;
   line-height: 1.4;
+}
+
+.author-name:hover {
+  cursor: pointer;
 }
 
 .post-meta {
