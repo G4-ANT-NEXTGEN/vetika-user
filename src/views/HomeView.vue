@@ -1,5 +1,6 @@
 <template>
   <div class="home-view">
+    <ShootingStars />
     <AppNavbar />
 
     <div class="home-container">
@@ -36,6 +37,7 @@ import MainLayout from '@/layout/MainLayout.vue';
 import AppSidebar from '@/components/layout/AppSidebar.vue';
 import RightSidebar from '@/components/layout/RightSidebar.vue';
 import AppNavbar from '@/components/layout/AppNavbar.vue';
+import ShootingStars from '@/components/ui/background/ShootingStars.vue';
 
 const route = useRoute();
 const isHomePage = computed(() => route.name === 'home');
@@ -64,6 +66,8 @@ defineOptions({
   margin-right: auto;
   width: 100%;
   overflow: hidden;
+  position: relative;
+  z-index: 1;
 }
 
 .main-content-column {

@@ -16,10 +16,10 @@ import Step3PositionUserView from '@/views/register/Step3PositionUserView.vue'
 import Step4PreviewUserView from '@/views/register/Step4PreviewUserView.vue'
 import LandingView from '@/views/LandingView.vue'
 import AboutView from '@/views/AboutView.vue'
-import EventsView from '@/views/EventsView.vue'
 import HelpView from '@/views/HelpView.vue'
 import FeedView from '@/views/feed/FeedView.vue'
 import ProfileDetailView from '@/views/profile/ProfileDetailView.vue'
+import profileUserDetailView from '@/views/profile/profileUserDetailView.vue'
 
 import ChatLayout from '@/layout/ChatLayout.vue'
 import ChatRoomView from '@/views/chat/ChatRoomView.vue'
@@ -54,12 +54,6 @@ const router = createRouter({
           name: 'about',
           component: AboutView,
           meta: { title: 'About' }
-        },
-        {
-          path: '/events',
-          name: 'events',
-          component: EventsView,
-          meta: { title: 'Events' }
         },
         {
           path: '/home/help',
@@ -135,6 +129,15 @@ const router = createRouter({
       path: '/profile',
       name: 'profile',
       component: ProfileDetailView,
+      meta: {
+        title: 'ProfileDetail',
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/profileuser/:id',
+      name: 'profileuser',
+      component: profileUserDetailView,
       meta: {
         title: 'ProfileDetail',
         requiresAuth: true

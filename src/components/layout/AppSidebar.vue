@@ -7,7 +7,7 @@
         <div class="profile-cover">
           <div class="cover-grid"></div>
           <div class="cover-overlay">
-            <img class="img-fluid" src="" alt="">
+            <img v-if="authStore.user?.cover" class="w-100 h-100 object-contain" :src="authStore.user?.cover" alt="">
           </div>
         </div>
 
@@ -57,10 +57,6 @@
         <router-link :to="{ name: 'home' }" class="nav-item" active-class="active">
           <i class="bi bi-house-door-fill"></i>
           <span>Feed</span>
-        </router-link>
-        <router-link :to="{ name: 'events' }" class="nav-item" active-class="active">
-          <i class="bi bi-calendar-event-fill"></i>
-          <span>Events</span>
         </router-link>
         <router-link :to="{ name: 'about' }" class="nav-item" active-class="active">
           <i class="bi bi-info-circle-fill"></i>
@@ -150,6 +146,8 @@ defineOptions({
 
 /* Cover Overlay */
 .cover-overlay {
+  width: 100%;
+  height: 100%;
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.2) 100%);
