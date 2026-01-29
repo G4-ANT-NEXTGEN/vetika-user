@@ -29,41 +29,29 @@
           <img class="avatar" src="../../assets/avatar.jpg" alt="Profile" />
 
           <!-- Edit Avatar Button -->
-          <button class="avatar-edit" @click="openAvatarModal">
+          <button class="avatar-edit" @click="showImageCropper">
             <i class="bi bi-camera"></i>
           </button>
         </div>
 
-        <!-- Modal for Update and Delete Avatar -->
-        <BaseModal v-if="editAvatar" title="Profile Photo" @close="closeAvatarModal">
-          <div class="avatar-actions">
-            <label class="avatar-action upload">
-              <i class="bi bi-upload"></i>
-              Upload New Profile
-              <input type="file" hidden @change="onFileChange" />
-            </label>
-            <Cropper
-            ref="cropperRef"
-              v-if="image"
-              :src="image"
-              :stencil-props="{ aspectRatio: 1 }"
-              class="cropper"
-              @change="crop"
-            />
-            <img v-if="croppedImage" :src="croppedImage" class="preview px-4" width="100%" />
-            <div v-else-if="!image">
-              <p>Current Profile</p>
-              <img :src="profileStore.user.avatar" class="preview px-4" width="100%" />
+        <!-- Crop Modal -->
+        <BaseModal v-if="showImageCropper" title="Crop Profile Image" size="lg" @close="cancelCrop">
+            <div class="cropper-container">
+                <Cropper v-if="uploadedImage" ref="cropperRef" :src="uploadedImage" :stencil-props="{ aspectRatio: 1 }"
+                    :stencil-component="CircleStencil" />
             </div>
 
-            <button class="avatar-action delete" @click="handleAvatarDelete">
-              <i class="bi bi-trash"></i>
-              Remove Photo
-            </button>
-          </div>
-          <template #footer>
-            <base-button variant="secondary">Save</base-button>
-          </template>
+            <div class="mt-3">
+                <label for="imageUpload" class="btn btn-outline-secondary w-100">
+                    Choose Image
+                </label>
+                <input id="imageUpload" type="file" class="d-none" accept="image/*" @change="handleFileSelect" />
+            </div>
+
+            <template #footer>
+                <button @click="cancelCrop" class="btn btn-secondary">Cancel</button>
+                <button @click="applyCrop" class="btn btn-primary">Apply</button>
+            </template>
         </BaseModal>
 
         <!-- Info and Actions -->
@@ -98,11 +86,7 @@
             </button>
 
             <!-- Update Collaboration -->
-            <BaseModal
-              v-if="editCollaboration"
-              title="Upload Your Collaboration"
-              @close="closeEditCollaboration"
-            >
+            <BaseModal v-if="editCollaboration" title="Upload Your Collaboration" @close="closeEditCollaboration">
               <div class="mb-3">
                 <label for="formFile" class="form-label">Upload Your Collaboration</label>
                 <input class="form-control" type="file" id="formFile" />
@@ -123,16 +107,10 @@
             <BaseModal v-if="openSetting" title="Account Settings" @close="closeSetting">
               <!-- Tabs -->
               <div class="setting-tabs">
-                <button
-                  :class="['tab', { active: settingTab === 'password' }]"
-                  @click="settingTab = 'password'"
-                >
+                <button :class="['tab', { active: settingTab === 'password' }]" @click="settingTab = 'password'">
                   Change Password
                 </button>
-                <button
-                  :class="['tab danger', { active: settingTab === 'delete' }]"
-                  @click="settingTab = 'delete'"
-                >
+                <button :class="['tab danger', { active: settingTab === 'delete' }]" @click="settingTab = 'delete'">
                   Delete Account
                 </button>
               </div>
@@ -171,12 +149,8 @@
 
       <!-- Tabs -->
       <div class="profile-tabs">
-        <button
-          v-for="tab in tabs"
-          :key="tab.key"
-          :class="['tab-btn', { active: activeTab === tab.key }]"
-          @click="$emit('change-tab', tab.key)"
-        >
+        <button v-for="tab in tabs" :key="tab.key" :class="['tab-btn', { active: activeTab === tab.key }]"
+          @click="$emit('change-tab', tab.key)">
           {{ tab.label }}
         </button>
       </div>
@@ -196,7 +170,7 @@ onMounted(async () => {
   console.log(await profileStore.fetchProfile())
 })
 const image = ref(null)
-const cropperRef=ref()
+const cropperRef = ref()
 const croppedImage = ref(null)
 // const formData=new FormData()
 const onFileChange = (e) => {
@@ -205,11 +179,11 @@ const onFileChange = (e) => {
   image.value = URL.createObjectURL(file)
 }
 const crop = async () => {
-    const canvas = cropperRef.value.getResult().canvas;
-    const avatar = canvas.toDataURL("image/jpeg", 0.9);
-    await profileStore.uploadAvatarBase64(avatar);
-    showImageCropper.value = false;
-    uploadedImage.value = null;
+  const canvas = cropperRef.value.getResult().canvas;
+  const avatar = canvas.toDataURL("image/jpeg", 0.9);
+  await profileStore.uploadAvatarBase64(avatar);
+  showImageCropper.value = false;
+  uploadedImage.value = null;
 };
 
 
