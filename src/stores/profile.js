@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import api from "@/api/api";
-import {showSuccess,showError,showWarning} from '@/utils/toast'
+import {showSuccess,showError} from '@/utils/toast'
 
 export const useProfileStore = defineStore("profile", () => {
   const user = ref(null);
@@ -231,6 +231,7 @@ export const useProfileStore = defineStore("profile", () => {
     uploadCoverBase64,
     uploadCover,
     removeCover,
-    uploadCv
+    uploadCv,
+    addCollaboration
   };
 });

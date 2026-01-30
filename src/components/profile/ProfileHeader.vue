@@ -130,16 +130,16 @@
             </button>
 
             <!-- Update Collaboration -->
-            <BaseModal v-if="editCollaboration" title="Upload Your Collaboration" @close="closeEditCollaboration">
+            <BaseModal v-if="editCollaboration" title="Upload Your Collaboration" @close="editCollaboration = false">
               <div class="mb-3">
                 <label for="formFile" class="form-label">Upload Your Collaboration</label>
-                <input class="form-control" type="file" id="formFile" />
+                <input class="form-control" type="file" id="formFile" multiple @change="onChangeCompanyLogo"/>
               </div>
-              <BaseInput label="Company Link" />
+              <BaseInput label="Company Link" v-model="companyLink"/>
 
               <template #footer>
-                <button class="btn btn-outline-dark" @click="closeEditCollaboration">Cancel</button>
-                <button class="btn btn-dark" @click="HandleEditCollaboration">Save Changes</button>
+                <button class="btn btn-outline-dark" @click="editCollaboration = false">Cancel</button>
+                <button class="btn btn-dark" @click="HandleEditCollaboration" style="color:var(--color-surface)">Save Changes</button>
               </template>
             </BaseModal>
 
@@ -203,7 +203,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref,computed } from 'vue'
 import { useProfileStore } from '@/stores/profile'
 import { Cropper } from 'vue-advanced-cropper'
 defineProps({
@@ -215,19 +215,19 @@ defineProps({
 
 defineEmits(['change-tab'])
 
-const avatarUrl = computed(() => {
-  const image = profileStore.user?.profile_image || profileStore.user?.avatar
-  if (!image) return new URL('../../assets/avatar.jpg', import.meta.url).href
-  if (image.startsWith('http')) return image
-  return `${import.meta.env.VITE_API_BASE_URL}/${image.replace(/^\//, '')}`
-})
+// const avatarUrl = computed(() => {
+//   const image = profileStore.user?.profile_image || profileStore.user?.avatar
+//   if (!image) return new URL('../../assets/avatar.jpg', import.meta.url).href
+//   if (image.startsWith('http')) return image
+//   return `${import.meta.env.VITE_API_BASE_URL}/${image.replace(/^\//, '')}`
+// })
 
-const coverUrl = computed(() => {
-  const image = profileStore.user?.cover_image
-  if (!image) return new URL('../../assets/R.png', import.meta.url).href
-  if (image.startsWith('http')) return image
-  return `${import.meta.env.VITE_API_BASE_URL}/${image.replace(/^\//, '')}`
-})
+// const coverUrl = computed(() => {
+//   const image = profileStore.user?.cover_image
+//   if (!image) return new URL('../../assets/R.png', import.meta.url).href
+//   if (image.startsWith('http')) return image
+//   return `${import.meta.env.VITE_API_BASE_URL}/${image.replace(/^\//, '')}`
+// })
 
 const tabs = [
   { key: 'overview', label: 'Overview' },
@@ -244,6 +244,8 @@ const showImageCropper = ref(false)
 const deleteAvatar = ref(false)
 const deleteCover = ref(false)
 const uploadedImage = ref(null)
+const cvFile = ref()
+const companyLogo = ref()
 
 onMounted(async () => {
   await profileStore.fetchProfile()
@@ -279,14 +281,10 @@ const handleDeleteCover = async () => {
   await profileStore.removeCover()
   if (!(await profileStore.isLoading)) deleteCover.value = false
 }
-const cvFile = ref()
+
 const cvOnChangeFile = (e) => {
   const cv = e.target.files[0]
   if (!cv) return
-  if (cv.type !== 'application/pdf') {
-    alert('Only PDF allowed')
-    return
-  }
   cvFile.value = cv
 }
 const handleSaveCv = async () => {
@@ -355,8 +353,19 @@ function openEditCollaboration() {
 function closeEditCollaboration() {
   editCollaboration.value = false
 }
-const HandleEditCollaboration = () => {
-  alert('Successfully')
+const onChangeCompanyLogo = (e) =>{
+  const logo = e.target.files[0]
+  if(!logo) return
+  companyLogo.value=logo
+
+}
+const HandleEditCollaboration = async() => {
+  const companyLink = ref()
+  const formData = new FormData()
+  formData.append('company_logo',companyLogo.value)
+  formData.append('company_link',companyLink.value)
+  await profileStore.addCollaboration(formData)
+  console.log(await profileStore.addCollaboration(formData))
   editCollaboration.value = false
 }
 
@@ -461,7 +470,7 @@ img {
   background-size: cover;
   background-position: center;
   position: relative;
-  
+
 }
 
 .cover-img {
