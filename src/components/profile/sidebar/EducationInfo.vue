@@ -66,6 +66,7 @@ const onDelete = (id) => console.log('Delete education triggered', id)
 
 onMounted(async () => {
   if (!profileStore.user) {
+    
     try {
       await profileStore.fetchProfile()
     } catch (error) {

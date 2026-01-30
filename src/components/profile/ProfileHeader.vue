@@ -370,7 +370,7 @@ onMounted(async () => {
 .cover {
   height: 400px;
   position: relative;
-  
+
 }
 
 .cover-img {
