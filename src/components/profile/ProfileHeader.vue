@@ -467,7 +467,7 @@ img {
   background-size: cover;
   background-position: center;
   position: relative;
-  
+
 }
 
 .cover-img {

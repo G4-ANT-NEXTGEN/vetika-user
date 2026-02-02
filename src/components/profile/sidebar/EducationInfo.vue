@@ -121,6 +121,7 @@ const educations = computed(() => profileStore.user?.educations || [])
 
 onMounted(async () => {
   if (!profileStore.user) {
+    
     try {
       await profileStore.fetchProfile()
     } catch (error) {
