@@ -104,7 +104,7 @@
           <span class="engagement-count">{{ likeCount }}</span>
           <span class="engagement-label">Like</span>
         </button>
-
+      </div>
       <button class="action-btn">
         <i class="bi bi-chat"></i>
         <span>Comment</span>

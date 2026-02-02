@@ -2,7 +2,7 @@
   <div class="profile-header-wrapper">
     <!-- Cover -->
     <div class="cover position-relative">
-      <img :src="profileStore.user?.cover" alt="Profile Cover" class="cover-img " />
+      <img :src="profileStore.user?.cover" alt="Profile Cover" class="cover-img" />
       <button class="btn btn-light btn-sm edit-cover" @click="openEditCover">
         <i class="bi bi-pencil-square"></i>
         Edit Cover Photo
@@ -12,25 +12,45 @@
     <!-- Update Cover -->
     <BaseModal v-if="editCover" title="Update Your Cover" size="lg" @close="closeEditCover">
       <div class="cropper-container">
-        <Cropper v-if="uploadedImage" ref="cropperCoverRef" :src="uploadedImage"
-          :stencil-props="{ aspectRatio: null, resizable: true }" :stencil-component="CircleStencil" />
+        <Cropper
+          v-if="uploadedImage"
+          ref="cropperCoverRef"
+          :src="uploadedImage"
+          :stencil-props="{ aspectRatio: null, resizable: true }"
+          :stencil-component="CircleStencil"
+        />
       </div>
 
       <div class="mt-3">
         <label for="imageUpload" class="btn"> Choose Image </label>
-        <input id="imageUpload" type="file" class="d-none" accept="image/*" @change="handleFileSelect" />
+        <input
+          id="imageUpload"
+          type="file"
+          class="d-none"
+          accept="image/*"
+          @change="handleFileSelect"
+        />
       </div>
       <div class="mt-3">
-        <label for="deleteCover" class="btn" style="color: var(--color-danger)" @click="deleteCover = true">
+        <label
+          for="deleteCover"
+          class="btn"
+          style="color: var(--color-danger)"
+          @click="deleteCover = true"
+        >
           Delete Cover
         </label>
       </div>
 
       <template #footer>
         <base-button @click="cancelCrop" variant="secondary">Cancel</base-button>
-        <base-button @click="applyChageCover" :isLoading="profileStore.isLoading" variant="dark"
-          style="color: var(--color-surface)"><span>{{ profileStore.isLoading ? 'Saving...' : 'Save'
-            }}</span></base-button>
+        <base-button
+          @click="applyChageCover"
+          :isLoading="profileStore.isLoading"
+          variant="dark"
+          style="color: var(--color-surface)"
+          ><span>{{ profileStore.isLoading ? 'Saving...' : 'Save' }}</span></base-button
+        >
       </template>
     </BaseModal>
 
@@ -48,18 +68,38 @@
         </div>
 
         <!-- Crop Modal update avatar-->
-        <BaseModal v-if="showImageCropper" title="Crop Profile Image" @close="showImageCropper = false">
+        <BaseModal
+          v-if="showImageCropper"
+          title="Crop Profile Image"
+          @close="showImageCropper = false"
+        >
           <div class="cropper-container">
-            <Cropper v-if="uploadedImage" ref="cropperRef" :src="uploadedImage" :stencil-props="{ aspectRatio: 1 }"
-              :stencil-component="CircleStencil" />
+            <Cropper
+              v-if="uploadedImage"
+              ref="cropperRef"
+              :src="uploadedImage"
+              :stencil-props="{ aspectRatio: 1 }"
+              :stencil-component="CircleStencil"
+            />
           </div>
 
           <div class="mt-3">
             <label for="imageUpload" class="btn"> Choose Image </label>
-            <input id="imageUpload" type="file" class="d-none" accept="image/*" @change="handleFileSelect" />
+            <input
+              id="imageUpload"
+              type="file"
+              class="d-none"
+              accept="image/*"
+              @change="handleFileSelect"
+            />
           </div>
           <div class="mt-3">
-            <label for="imageDelete" class="btn" style="color: var(--color-danger)" @click="deleteAvatar = true">
+            <label
+              for="imageDelete"
+              class="btn"
+              style="color: var(--color-danger)"
+              @click="deleteAvatar = true"
+            >
               Delete Avatar
             </label>
             <!-- <input id="imageUpload" type="file" class="d-none" accept="image/*" @change="handleFileSelect" /> -->
@@ -67,9 +107,13 @@
 
           <template #footer>
             <base-button @click="showImageCropper = false" variant="secondary">Cancel</base-button>
-            <base-button @click="applyCrop" :isLoading="profileStore.isLoading" variant="dark"
-              style="background-color: var(--color-surface)"><span>{{ profileStore.isLoading ? 'Saving...' : 'Save'
-                }}</span></base-button>
+            <base-button
+              @click="applyCrop"
+              :isLoading="profileStore.isLoading"
+              variant="dark"
+              style="background-color: var(--color-surface)"
+              ><span>{{ profileStore.isLoading ? 'Saving...' : 'Save' }}</span></base-button
+            >
           </template>
         </BaseModal>
         <!-- delete avatar modal  -->
@@ -77,9 +121,13 @@
           <p>Are you sure!</p>
           <template #footer>
             <base-button @click="deleteAvatar = false" variant="secondary">Cancel</base-button>
-            <base-button @click="handleAvatarDelete" variant="dark" :isLoading="profileStore.isLoading"
-              style="background-color: var(--color-danger)"><span>{{ profileStore.isLoading ? 'Saving...' : 'Save'
-                }}</span></base-button>
+            <base-button
+              @click="handleAvatarDelete"
+              variant="dark"
+              :isLoading="profileStore.isLoading"
+              style="background-color: var(--color-danger)"
+              ><span>{{ profileStore.isLoading ? 'Saving...' : 'Save' }}</span></base-button
+            >
           </template>
         </base-modal>
         <!-- delete cover modal  -->
@@ -87,9 +135,13 @@
           <p>Are you sure!</p>
           <template #footer>
             <base-button @click="deleteCover = false" variant="secondary">Cancel</base-button>
-            <base-button @click="handleDeleteCover" variant="dark" :isLoading="profileStore.isLoading"
-              style="background-color: var(--color-danger)"><span>{{ profileStore.isLoading ? 'Saving...' : 'Save'
-                }}</span></base-button>
+            <base-button
+              @click="handleDeleteCover"
+              variant="dark"
+              :isLoading="profileStore.isLoading"
+              style="background-color: var(--color-danger)"
+              ><span>{{ profileStore.isLoading ? 'Saving...' : 'Save' }}</span></base-button
+            >
           </template>
         </base-modal>
 
@@ -111,50 +163,111 @@
             <!-- Update CV -->
             <BaseModal v-if="editCV" title="Upload Your CV" @close="editCV = false">
               <div class="mb-3">
-                <label for="formFile" class="form-label">Upload Your CV</label>
-                <input class="form-control" type="file" id="formFile" @change="cvOnChangeFile" accept="application/pdf"
-                  multiple />
+                <!-- <label for="formFile" class="form-label">Upload Your CV</label>      -->
+                <div class="card-body ">
+                  <div class="upload-box mx-2 p-4">
+                    <div class="text-center w-100">
+                      <div class="upload-icon">
+                        <i class="bi bi-cloud-arrow-up"></i>
+                      </div>
+                      <div class="upload-text">
+                        Drop your files here or
+                        <label class="browse-link"
+                          ><input
+                            type="file"
+                            hidden
+                            
+                            @change="cvOnChangeFile"
+                           multiple
+                          />Browse</label
+                        >
+                        <p v-if="cvFile">{{ cvFile.name }}</p>
+                      </div>
+                      <div v-if="!cvFile" class="upload-limit">Max CV size 5 MB</div>
+                    </div>
+                  </div>
+                </div>
+                <!-- <BaseInput/> -->
               </div>
 
               <template #footer>
                 <button class="btn btn-outline-dark" @click="closeEditCV">Cancel</button>
-                <base-button class="btn btn-dark" @click="handleSaveCv" :isLoading="profileStore.isLoading" style="background-color: var(--color-danger)">
+                <base-button
+                  class="btn btn-dark"
+                  @click="handleSaveCv"
+                  :isLoading="profileStore.isLoading"
+                  style="color: var(--color-surface)"
+                >
                   <span>{{ profileStore.isLoading ? 'Saving...' : 'Save' }}</span>
                 </base-button>
               </template>
             </BaseModal>
 
-            <button class="btn btn-outline" @click="openEditCollaboration">
+            <button class="btn btn-outline" @click="editCollaboration = true">
               <i class="bi bi-people"></i>
               Collaboration
             </button>
 
             <!-- Update Collaboration -->
-            <BaseModal v-if="editCollaboration" title="Upload Your Collaboration" @close="closeEditCollaboration">
-              <div class="mb-3">
-                <label for="formFile" class="form-label">Upload Your Collaboration</label>
-                <input class="form-control" type="file" id="formFile" />
-              </div>
-              <BaseInput label="Company Link" />
+            <BaseModal
+              v-if="editCollaboration"
+              title="Upload Your Collaboration"
+              @close="editCollaboration =false"
+            >
+            <label for="formFile" class="form-label">Company Logo</label>
+            <div class="card-body">
+                  <div class="upload-box mx-2 pt-2 mb-3">
+                    <div class="text-center w-100">
+                      <div class="upload-icon">
+                        <i class="bi bi-cloud-arrow-up"></i>
+                      </div>
+                      <div class="upload-text">
+                        Drop your files here or
+                        <label class="browse-link"
+                          ><input
+                          
+                            type="file"
+                            hidden
+                            @change="onCompanyLogoChange"
+                           multiple
+                          />Browse</label
+                        >
+                        <p v-if="companyLogo">{{ companyLogo.name }}</p>
+                      </div>
+                      <div v-if="!companyLogo" class="upload-limit">Max CV size 5 MB</div>
+                    </div>
+                  </div>
+                </div>
+                <label for="formFile" class="form-label">Company Link</label>
+                <div class="mx-2">
+
+                  <base-input  v-model="companyLink"></base-input>
+                </div>
 
               <template #footer>
-                <button class="btn btn-outline-dark" @click="closeEditCollaboration">Cancel</button>
-                <button class="btn btn-dark" @click="HandleEditCollaboration">Save Changes</button>
+                <base-button class="btn btn-outline-dark" @click="editCollaboration = false">Cancel</base-button>
+                <base-button class="btn btn-dark" @click="HandleEditCollaboration" style="color:var(--color-surface)">Save Changes</base-button>
               </template>
             </BaseModal>
 
-            <button class="btn btn-icon" @click="openChangePassAndDeleteAcc">
+            <base-button class="btn btn-icon" @click="seting = true">
               <i class="bi bi-gear"></i>
-            </button>
+            </base-button>
 
             <!-- Modal Change Password And Delete Account -->
-            <BaseModal v-if="openSetting" title="Account Settings" @close="closeSetting">
+            <BaseModal v-if="seting" title="Account Settings" @close="seting = false">
               <!-- Tabs -->
               <div class="setting-tabs">
-                <button :class="['tab', { active: settingTab === 'password' }]" @click="settingTab = 'password'">
+                <button
+                  :class="['tab', { active: settingTab === 'password' }]"
+                  @click="settingTab = 'password'"
+                >
                   Change Password
                 </button>
-                <button :class="['tab danger', { active: settingTab === 'delete' }]" @click="settingTab = 'delete'">
+                <button
+                  :class="['tab danger', { active: settingTab === 'delete' }]"
+                  @click="settingTab = 'delete'"
+                >
                   Delete Account
                 </button>
               </div>
@@ -167,8 +280,8 @@
                   <BaseInput label="New Password" type="password" />
                   <BaseInput label="Confirm New Password" type="password" />
 
-                  <div class="footer">
-                    <button class="btn btn-dark">Update Password</button>
+                  <div class="footer">  
+                    <base-button class="btn" variant="secondary">Update Password</base-button>
                   </div>
                 </div>
 
@@ -182,7 +295,7 @@
                   <BaseInput label="Type DELETE to confirm" />
 
                   <div class="footer">
-                    <button class="btn btn-danger">Delete My Account</button>
+                    <base-button class="btn btn-danger">Delete My Account</base-button>
                   </div>
                 </div>
               </div>
@@ -193,8 +306,12 @@
 
       <!-- Tabs -->
       <div class="profile-tabs">
-        <button v-for="tab in tabs" :key="tab.key" :class="['tab-btn', { active: activeTab === tab.key }]"
-          @click="$emit('change-tab', tab.key)">
+        <button
+          v-for="tab in tabs"
+          :key="tab.key"
+          :class="['tab-btn', { active: activeTab === tab.key }]"
+          @click="$emit('change-tab', tab.key)"
+        >
           {{ tab.label }}
         </button>
       </div>
@@ -215,20 +332,6 @@ defineProps({
 
 defineEmits(['change-tab'])
 
-const avatarUrl = computed(() => {
-  const image = profileStore.user?.profile_image || profileStore.user?.avatar
-  if (!image) return new URL('../../assets/avatar.jpg', import.meta.url).href
-  if (image.startsWith('http')) return image
-  return `${import.meta.env.VITE_API_BASE_URL}/${image.replace(/^\//, '')}`
-})
-
-const coverUrl = computed(() => {
-  const image = profileStore.user?.cover_image
-  if (!image) return new URL('../../assets/R.png', import.meta.url).href
-  if (image.startsWith('http')) return image
-  return `${import.meta.env.VITE_API_BASE_URL}/${image.replace(/^\//, '')}`
-})
-
 const tabs = [
   { key: 'overview', label: 'Overview' },
   { key: 'professional', label: 'Professional' },
@@ -244,6 +347,7 @@ const showImageCropper = ref(false)
 const deleteAvatar = ref(false)
 const deleteCover = ref(false)
 const uploadedImage = ref(null)
+const seting = ref(false)
 
 onMounted(async () => {
   await profileStore.fetchProfile()
@@ -279,26 +383,45 @@ const handleDeleteCover = async () => {
   await profileStore.removeCover()
   if (!(await profileStore.isLoading)) deleteCover.value = false
 }
+const companyLogo =ref()
+const companyLink = ref()
+const onCompanyLogoChange = (e) =>{
+  const logo = e.target.files[0]
+  if(!logo) return
+  companyLogo.value=logo
+}
+const HandleEditCollaboration = async() => {
+  const formData = new FormData()
+  formData.append('company_logo',companyLogo.value)
+  formData.append('company_link',companyLink.value)
+  await profileStore.addCollaboration(formData) 
+  editCollaboration.value = false
+  companyLogo.value=null
+  companyLink.value=null
+}
 const cvFile = ref()
 const cvOnChangeFile = (e) => {
   const cv = e.target.files[0]
   if (!cv) return
+  
   if (cv.type !== 'application/pdf') {
     alert('Only PDF allowed')
     return
   }
   cvFile.value = cv
 }
+
 const handleSaveCv = async () => {
   if (!cvFile.value) return
   await profileStore.uploadCv(cvFile.value)
+  console.log('this is cv file : ',cvFile.value)
   editCV.value = false
+  cvFile.value=null
 }
-
 
 onMounted(async () => {
   await profileStore.fetchProfile()
-  console.table(profileStore.user);
+  console.table(profileStore.user)
 })
 
 const editAvatar = ref(false)
@@ -361,15 +484,9 @@ function openEditCollaboration() {
 function closeEditCollaboration() {
   editCollaboration.value = false
 }
-const HandleEditCollaboration = () => {
-  alert('Successfully')
-  editCollaboration.value = false
-}
 
-const openSetting = ref(false)
-function openChangePassAndDeleteAcc() {
-  openSetting.value = true
-}
+
+
 function closeSetting() {
   openSetting.value = false
 }
@@ -467,7 +584,6 @@ img {
   background-size: cover;
   background-position: center;
   position: relative;
-
 }
 
 .cover-img {
@@ -701,6 +817,59 @@ img {
   border-radius: 6px;
   border: none;
 }
+.upload-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.upload-header {
+  background-color: #f0f0f0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.upload-box {
+  border: 2px dashed #d0d0d0;
+  border-radius: 8px;
+  background-color: #fafafa;
+  transition: all 0.3s ease;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 40px;
+}
+
+.upload-box:hover {
+  border-color: #999;
+  background-color: #f5f5f5;
+}
+
+.upload-icon {
+  font-size: 48px;
+  color: #999;
+  margin-bottom: 20px;
+}
+
+.browse-link {
+  color: #0d6efd;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.browse-link:hover {
+  color: #0a58ca;
+}
+
+.upload-text {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.upload-limit {
+  font-size: 12px;
+  color: #999;
+}
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
@@ -723,5 +892,6 @@ img {
   .tab-btn {
     white-space: nowrap;
   }
+ 
 }
 </style>
