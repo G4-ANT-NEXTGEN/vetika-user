@@ -25,14 +25,22 @@
 
     <!-- Modal for Update Personal Info -->
     <BaseModal v-if="personalUpdate" title="Update Personal Info" @close="closePersonalUpdate">
-      <BaseInput label="Full Name" placeholder="Enter Your Full Name" />
-      <BaseInput label="Email" placeholder="Enter Your Email" />
-      <BaseInput label="Phone" placeholder="Enter Your Phone Number" />
-      <BaseInput label="Date of Birth" placeholder="Enter Your Date of Birth" />
-      <BaseInput label="Gender" placeholder="Enter Your Gender" />
-      <BaseInput label="Current City" placeholder="Enter Your Current City" />
-      <BaseInput label="Hometown" placeholder="Enter Your Hometown" />
-      <BaseInput label="Portfolio Link" placeholder="Enter Your Phone Number" />
+      <BaseInput label="Full Name" placeholder="Enter Your Full Name" v-model="full_name" />
+      <BaseInput label="Email" placeholder="Enter Your Email" v-model="email" />
+      <BaseInput label="Phone" placeholder="Enter Your Phone Number" v-model="phone" />
+      <BaseInput label="Date of Birth" placeholder="Enter Your Date of Birth" v-model="DOB" />
+      <BaseInput label="Gender" placeholder="Enter Your Gender" v-model="gender" />
+      <BaseInput
+        label="Current City"
+        placeholder="Enter Your Current City"
+        v-model="current_city"
+      />
+      <BaseInput label="Hometown" placeholder="Enter Your Hometown" v-model="home_town" />
+      <BaseInput
+        label="Portfolio Link"
+        placeholder="Enter Your Portfolio Link"
+        v-model="portfolio_link"
+      />
 
       <template #footer>
         <button class="btn btn-outline-dark" @click="closePersonalUpdate">Cancel</button>
@@ -68,14 +76,15 @@
       title="Update Profession Info"
       @close="closeProfessionalUpdate"
     >
-      <BaseInput label="Job Title" placeholder="e.g Software Engineering" />
-      <BaseInput label="Company Name" placeholder="e.g Chipmong Group" />
+      <BaseInput label="Job Title" placeholder="e.g Software Engineering" v-model="job_title" />
+      <BaseInput label="Company Name" placeholder="e.g Chipmong Group" v-model="company_name" />
       <div class="mb-2">
         <label class="mb-2 fw-semibold">Responsibilities</label>
         <textarea
           class="form-control"
           placeholder="Responsibilities"
           style="height: 100px"
+          v-model="responsibility"
         ></textarea>
       </div>
 
@@ -142,12 +151,22 @@
     <!-- Modal for Project -->
     <!-- Add New Project -->
     <BaseModal v-if="addNewProject" title="Create New Project" @close="closeAddNewProject">
-      <BaseInput label="Project Title" placeholder="Enter Your Project Title" />
-      <BaseInput label="Project Link " placeholder="Enter Your Project Link" />
+      <BaseInput
+        label="Project Title"
+        placeholder="Enter Your Project Title"
+        v-model="projectTitle"
+      />
+      <BaseInput
+        label="Project Link "
+        placeholder="Enter Your Project Link"
+        v-model="projectLink"
+      />
 
       <template #footer>
         <button class="btn btn-outline-dark" @click="closeAddNewProject">Cancel</button>
-        <button class="btn btn-dark" @click="HandleAddNewProject">Save Changes</button>
+        <button class="btn btn-dark" @click="HandleAddNewProject">
+          {{ isLoading ? 'Adding New' : 'Add New' }}
+        </button>
       </template>
     </BaseModal>
 
@@ -171,56 +190,61 @@
     <!-- Add New Education -->
     <BaseModal v-if="addNewEducation" title="Add New Education" @close="closeAddNewEducation">
       <BaseSelect
-        v-model="level"
+        v-model="school"
         label="School/University"
-        placeholder="Select Sclool"
+        placeholder="Select School"
         :options="[
-          { value: 'rupp', label: 'RUPP' },
-          { value: 'aupp', label: 'AUPP' },
-          { value: 'ict', label: 'ICT' },
+          ...schoolStore.schools.map((school) => ({ value: school.id, label: school.name })),
         ]"
       />
       <div class="d-flex my-2">
         <div class="col-6 me-1">
           <BaseSelect
-            v-model="level"
+            v-model="degree"
             label="Degree"
             placeholder="Select Degree"
             :options="[
-              { value: 'master', label: 'Master' },
-              { value: 'bachelor', label: 'Bachelor' },
-              { value: 'phd', label: 'PHD' },
+              ...degreeStore.degrees.map((degree) => ({ value: degree.id, label: degree.name })),
             ]"
           />
         </div>
         <div class="col-6 ms-1">
           <BaseSelect
-            v-model="level"
+            v-model="subject"
             label="Subject"
             placeholder="Select Subject"
             :options="[
-              { value: 'computer_science', label: 'Computer Science' },
-              { value: 'ITE', label: 'Information Technology And Engineering' },
+              ...subjectStore.subjects.map((subject) => ({
+                value: subject.id,
+                label: subject.name,
+              })),
             ]"
           />
         </div>
       </div>
       <div class="d-flex my-2">
         <div class="col-6 me-1">
-          <BaseInput label="Start Date" />
+          <BaseInput label="Start Date" placeholder="Year-Month" v-model="start_date" />
         </div>
         <div class="col-6 ms-1">
-          <BaseInput label="End Date " />
+          <BaseInput label="End Date " placeholder="Year-Month" v-model="end_date" />
         </div>
       </div>
       <div class="mb-2">
         <label class="mb-2 fw-semibold">Description</label>
-        <textarea class="form-control" placeholder="Description" style="height: 100px"></textarea>
+        <textarea
+          class="form-control"
+          placeholder="Description"
+          style="height: 100px"
+          v-model="description"
+        ></textarea>
       </div>
 
       <template #footer>
         <button class="btn btn-outline-dark" @click="closeAddNewEducation">Cancel</button>
-        <button class="btn btn-dark" @click="HandleAddNewEducation">Save Changes</button>
+        <button class="btn btn-dark" @click="HandleAddNewEducation">
+          {{ isLoading ? 'Adding New' : 'Add New' }}
+        </button>
       </template>
     </BaseModal>
   </aside>
@@ -230,7 +254,14 @@
 import InfoCard from '@/components/profile/InfoCard.vue'
 import TomSelect from '@/components/ui/base/BaseTomSelect.vue'
 import { useProfileStore } from '@/stores/profile'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { useProjectStore } from '@/stores/project'
+import { useEducationStore } from '@/stores/education'
+import { useSchoolStore } from '@/stores/schools'
+import { useDegreeStore } from '@/stores/degrees'
+import { useSubjectStore } from '@/stores/subjects'
+import { useSkillStore } from '@/stores/skills'
+import { showSuccess, showError, showWarning } from '@/utils/toast'
 
 const profileStore = useProfileStore()
 
@@ -249,58 +280,173 @@ onMounted(async () => {
   }
 })
 
-// Personal Info - Update
+/* ---------------- Personal Info ---------------- */
 const personalUpdate = ref(false)
+const full_name = ref('')
+const email = ref('')
+const phone = ref('')
+const DOB = ref('')
+const gender = ref('')
+const current_city = ref('')
+const home_town = ref('')
+const portfolio_link = ref('')
+
+function UpdatePersonal() {
+  // Pre-fill current values from store
+  const u = profileStore.user
+  full_name.value = u?.full_name || ''
+  email.value = u?.email || ''
+  phone.value = u?.phone || ''
+  DOB.value = u?.dob || ''
+  gender.value = u?.gender || ''
+  current_city.value = u?.current_city || ''
+  home_town.value = u?.home_town || ''
+  portfolio_link.value = u?.portfolio_link || ''
+  personalUpdate.value = true
+}
+
 function closePersonalUpdate() {
   personalUpdate.value = false
 }
-function UpdatePersonal() {
-  personalUpdate.value = true
-}
-const HandleUpdatePersonal = () => {
-  alert('Successfully')
-  personalUpdate.value = false
+
+const HandleUpdatePersonal = async () => {
+  // Validation
+  if (!full_name.value || !email.value) {
+    showWarning('Full Name and Email are required!')
+    return
+  }
+
+  const payload = {
+    full_name: full_name.value,
+    email: email.value,
+    phone: phone.value,
+    dob: DOB.value,
+    gender: gender.value,
+    current_city: current_city.value,
+    home_town: home_town.value,
+    portfolio_link: portfolio_link.value,
+  }
+
+  try {
+    await profileStore.updatePersonalInfo(payload)
+    showSuccess('Personal info updated successfully!')
+    personalUpdate.value = false
+  } catch (error) {
+    console.error(error)
+    showError('Failed to update personal info!')
+  }
 }
 
-// Professional Info - Update
+/* ---------------- Professional Info ---------------- */
 const professionalUpdate = ref(false)
+const job_title = ref('')
+const company_name = ref('')
+const responsibility = ref('')
+
+function UpdateProfessional() {
+  const p = profileStore.user?.professional || {}
+  job_title.value = p.job_title || ''
+  company_name.value = p.company_name || ''
+  responsibility.value = p.responsibility || ''
+  professionalUpdate.value = true
+}
+
 function closeProfessionalUpdate() {
   professionalUpdate.value = false
 }
 
-function UpdateProfessional() {
-  professionalUpdate.value = true
+const HandleUpdateProfessional = async () => {
+  if (!job_title.value || !company_name.value) {
+    showWarning('Job Title and Company Name are required!')
+    return
+  }
+
+  const payload = {
+    job_title: job_title.value,
+    company_name: company_name.value,
+    responsibility: responsibility.value,
+  }
+
+  try {
+    await profileStore.updateProfessionalInfo(payload)
+    showSuccess('Professional info updated successfully!')
+    professionalUpdate.value = false
+  } catch (error) {
+    console.error(error)
+    showError('Failed to update professional info!')
+  }
 }
 
-const HandleUpdateProfessional = () => {
-  alert('Successfully')
-  professionalUpdate.value = false
-}
+/* ---------------- Stores ---------------- */
+const skillStore = useSkillStore()
 
-// Skill - Update
+/* ---------------- Skill Modal State ---------------- */
+const skillUpdate = ref(false)
 const skills = ref([])
 
-const skillOptions = [
-  { value: 'vue', label: 'Vue.js' },
-  { value: 'react', label: 'React' },
-  { value: 'node', label: 'Node.js' },
-  { value: 'php', label: 'PHP' },
-]
-const skillUpdate = ref(false)
+/* ---------------- Fetch Skills from API ---------------- */
+onMounted(async () => {
+  try {
+    await skillStore.fetchSkills()
+  } catch (error) {
+    console.error('Failed to fetch skills:', error)
+    showError('Failed to load skills from server!')
+  }
+})
+
+/* ---------------- Convert Skills into TomSelect Options ---------------- */
+const skillOptions = computed(() => {
+  return skillStore.skills.map((skill) => ({
+    value: skill.id,
+    label: skill.name,
+  }))
+})
+
+/* ---------------- Open Skill Modal + Show Current Skills ---------------- */
+function UpdateSkill() {
+  // Pre-fill selected skills (IDs)
+  skills.value = profileStore.user?.skills?.map((s) => s.id) || []
+
+  skillUpdate.value = true
+}
+
+/* ---------------- Close Modal ---------------- */
 function closeSkillUpdate() {
   skillUpdate.value = false
 }
 
-function UpdateSkill() {
-  skillUpdate.value = true
-}
+/* ---------------- Save Updated Skills ---------------- */
+const HandleUpdateSkill = async () => {
+  // Validation
+  if (!skills.value.length) {
+    showWarning('Please select at least one skill!')
+    return
+  }
 
-const HandleUpdateSkill = () => {
-  alert('Successfully')
-  skillUpdate.value = false
+  // Payload to backend
+  const payload = {
+    skill_ids: skills.value,
+  }
+
+  try {
+    // ⚠️ Change this API method if your backend uses different endpoint
+    await profileStore.updateProfessionalInfo(payload)
+
+    showSuccess('Skills updated successfully!')
+    skillUpdate.value = false
+  } catch (error) {
+    console.error('Skill update failed:', error)
+    showError('Failed to update skills!')
+  }
 }
 
 // Projects Add New
+const projectStore = useProjectStore()
+
+const projectTitle = ref('')
+const projectLink = ref('')
+
+const isLoading = ref(false)
 const addNewProject = ref(false)
 function closeAddNewProject() {
   addNewProject.value = false
@@ -310,12 +456,51 @@ function AddProject() {
   addNewProject.value = true
 }
 
-const HandleAddNewProject = () => {
-  alert('Successfully')
-  addNewProject.value = false
+const HandleAddNewProject = async () => {
+  if (!projectTitle.value || !projectLink.value) {
+    alert('Please fill all fields!')
+    return
+  }
+  isLoading.value = true
+
+  try {
+    const payload = {
+      title: projectTitle.value,
+      link: projectLink.value,
+    }
+
+    await projectStore.CreateProject(payload)
+
+    addNewProject.value = false
+    projectTitle.value = ''
+    projectLink.value = ''
+  } catch (error) {
+    console.log('Fail to Create Prooject')
+  } finally {
+    isLoading.value = false
+  }
 }
 
 // Education Add New
+const educationStore = useEducationStore()
+
+const schoolStore = useSchoolStore()
+const degreeStore = useDegreeStore()
+const subjectStore = useSubjectStore()
+
+onMounted(() => {
+  schoolStore.fetchSchools()
+  degreeStore.fetchDegrees()
+  subjectStore.fetchSubjects()
+})
+
+const school = ref('')
+const degree = ref('')
+const subject = ref('')
+const start_date = ref('')
+const end_date = ref('')
+const description = ref('')
+
 const addNewEducation = ref(false)
 const closeAddNewEducation = () => {
   addNewEducation.value = false
@@ -325,8 +510,44 @@ function createEducation() {
   addNewEducation.value = true
 }
 
-const HandleAddNewEducation = () => {
-  alert('Successfully')
-  addNewEducation.value = false
+const HandleAddNewEducation = async () => {
+  if (!school.value || !degree.value || !subject.value) {
+    alert('Please select all fields!')
+    return
+  }
+
+  if (!start_date.value || !end_date.value) {
+    alert('Please enter start and end date!')
+    return
+  }
+
+  isLoading.value = true
+
+  const payload = {
+    school_id: school.value,
+    degree_id: degree.value,
+    subject_id: subject.value,
+    start_date: start_date.value,
+    end_date: end_date.value,
+    description: description.value,
+  }
+
+  console.log('Education Payload:', payload)
+
+  try {
+    await educationStore.CreateEducation(payload)
+
+    addNewEducation.value = false
+
+    school.value = ''
+    degree.value = ''
+    subject.value = ''
+    start_date.value = ''
+    end_date.value = ''
+    description.value = ''
+  } catch (error) {
+    console.log('Failed to Create Education:', error.response?.data)
+    isLoading.value = true
+  }
 }
 </script>

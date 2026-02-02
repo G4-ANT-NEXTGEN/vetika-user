@@ -18,10 +18,12 @@ import LandingView from '@/views/LandingView.vue'
 import AboutView from '@/views/AboutView.vue'
 import HelpView from '@/views/HelpView.vue'
 import FeedView from '@/views/feed/FeedView.vue'
+import ContactView from '@/views/ContactView.vue'
 import ProfileDetailView from '@/views/profile/ProfileDetailView.vue'
 import profileUserDetailView from '@/views/profile/profileUserDetailView.vue'
 
 import ProfileHeaderTest from '@/components/profile/ProfileHeaderTest.vue'
+import UserProfileView from '@/views/profile/UserProfileView.vue'
 
 import ChatLayout from '@/layout/ChatLayout.vue'
 import ChatRoomView from '@/views/chat/ChatRoomView.vue'
@@ -58,12 +60,27 @@ const router = createRouter({
           meta: { title: 'About' }
         },
         {
-          path: '/home/help',
+          path: '/help',
           name: 'help',
           component: HelpView,
           meta: { title: 'Help' }
+        },
+        {
+          path: '/contact',
+          name: 'contact',
+          component: ContactView,
+          meta: { title: 'Contact' }
         }
       ]
+    },
+    {
+      path: '/profile/:id',
+      name: 'profile',
+      component: ProfileDetailView,
+      meta: {
+        title: 'ProfileDetail',
+        requiresAuth: true
+      }
     },
     {
       path: '/',
@@ -128,8 +145,8 @@ const router = createRouter({
       ]
     },
     {
-      path:'/profile-test',
-      component:ProfileHeaderTest
+      path: '/profile-test',
+      component: ProfileHeaderTest
     },
     {
       path: '/profile',
@@ -141,11 +158,11 @@ const router = createRouter({
       }
     },
     {
-      path: '/profileuser/:id',
-      name: 'profileuser',
-      component: profileUserDetailView,
+      path: '/profile-user/:id',
+      name: 'view-profile',
+      component: UserProfileView,
       meta: {
-        title: 'ProfileDetail',
+        title: 'UserProfile',
         requiresAuth: true
       }
     },
@@ -193,7 +210,7 @@ const router = createRouter({
 
 router.beforeEach(async (to) => {
   const authStore = useAuthStore()
-  document.title = to.meta.title ? to.meta.title + ' - My Admin' : 'My Admin'
+  document.title = to.meta.title ? to.meta.title + ' - Next Gen' : 'Next Gen'
 
   // check user have token or not and have user profile data
   if (authStore.token && !authStore.user) {
