@@ -1,184 +1,194 @@
 <template>
-  <div>
-    <InfoCard
-      title="Projects"
-      icon="bi bi-folder"
-      :showCreate="false"
-      :showUpdate="true"
-      :showDelete="true"
-      @update="UpdateProjects"
-    >
-      <div v-for="project in profileStore.user?.projects" :key="project.id" class="project-card">
-        <!-- Project Title -->
-        <div class="info-row title-row">
-          <i class="bi bi-folder2-open icon"></i>
-          <h4 class="project-title">{{ project.title }}</h4>
-        </div>
-
-        <!-- Project Link -->
+  <section class="projects-section">
+    <!-- Own Profile - Projects with Edit/Delete -->
+    <template v-if="isOwnProfile && projects.length">
+      <InfoCard
+        v-for="project in projects"
+        :key="project.id"
+        :title="project.title || 'Project'"
+        icon="bi bi-folder"
+        class="project-card"
+        :showCreate="false"
+        :showUpdate="true"
+        :showDelete="true"
+        @create="onCreate"
+        @update="() => onUpdate(project)"
+        @delete="() => openDeleteModal(project)"
+      >
         <div v-if="project.link" class="info-row">
           <i class="bi bi-link-45deg icon"></i>
-          <a :href="project.link" target="_blank" class="project-link">{{ project.link }}</a>
+          <a :href="project.link" target="_blank" class="project-link">
+            {{ project.link }}
+          </a>
         </div>
-      </div>
+      </InfoCard>
+    </template>
 
-      <div v-if="!profileStore.user?.projects?.length" class="no-data">
+    <!-- Own Profile - Empty State -->
+    <InfoCard
+      v-else-if="isOwnProfile"
+      title="Projects"
+      icon="bi bi-folder"
+      :showCreate="true"
+      :showUpdate="false"
+      :showDelete="false"
+      @create="onCreate"
+    >
+      <div class="no-data">
         <p>No projects available</p>
       </div>
     </InfoCard>
 
-    <!-- Modal For Add New Project -->
-    <BaseModal
-      v-if="projectUpdate"
-      title="Update Profession Info"
-      @close="closeProjectUpdate"
+    <!-- Viewing Other User - Projects Read-Only -->
+    <template v-else-if="!isOwnProfile && viewProjects.length">
+      <InfoCard
+        v-for="project in viewProjects"
+        :key="project.id"
+        :title="project.title || 'Project'"
+        icon="bi bi-folder"
+        class="project-card"
+        :showCreate="false"
+        :showUpdate="false"
+        :showDelete="false"
+      >
+        <div v-if="project.link" class="info-row">
+          <i class="bi bi-link-45deg icon"></i>
+          <a :href="project.link" target="_blank" class="project-link">
+            {{ project.link }}
+          </a>
+        </div>
+      </InfoCard>
+    </template>
+
+    <!-- Viewing Other User - Empty State -->
+    <InfoCard
+      v-else
+      title="Projects"
+      icon="bi bi-folder"
+      :showCreate="false"
+      :showUpdate="false"
+      :showDelete="false"
     >
-      <BaseInput label="Project Title" placeholder="e.g Software Engineering" v-model="projectTitle" />
-      <BaseInput label="Project Link" placeholder="e.g www.facebook.com" v-model="projectLink"/>
+      <div class="no-data">
+        <p>No projects available</p>
+      </div>
+    </InfoCard>
+
+    <!-- UPDATE MODAL -->
+    <BaseModal v-if="projectUpdate" title="Update Project" @close="closeProjectUpdate">
+      <BaseInput label="Project Title" v-model="projectTitle" />
+      <BaseInput label="Project Link" v-model="projectLink" />
 
       <template #footer>
         <button class="btn btn-outline-dark" @click="closeProjectUpdate">Cancel</button>
-        <button class="btn btn-dark" @click="HandleUpdateProject">Save Changes</button>
+        <button class="btn btn-dark" @click="handleUpdateProject">Save Changes</button>
       </template>
     </BaseModal>
 
-    
-  </div>
+    <!-- DELETE CONFIRMATION MODAL -->
+    <BaseModal v-if="deleteModal" title="Delete Project" @close="closeDeleteModal">
+      <p class="mb-0">
+        Are you sure you want to delete
+        <strong>{{ selectedProjectForDelete?.title }}</strong
+        >? This action cannot be undone.
+      </p>
+
+      <template #footer>
+        <button class="btn btn-outline-dark" @click="closeDeleteModal">Cancel</button>
+        <button class="btn btn-danger" @click="confirmDeleteProject">Delete</button>
+      </template>
+    </BaseModal>
+  </section>
 </template>
 
+
 <script setup>
+import { ref, computed, onMounted } from 'vue'
 import BaseModal from '@/components/ui/base/BaseModal.vue'
 import InfoCard from '../InfoCard.vue'
-import { onMounted } from 'vue'
 import { useProfileStore } from '@/stores/profile'
+import { useProjectStore } from '@/stores/project'
 
 const profileStore = useProfileStore()
-
-const UpdateProjects = () => {
-  console.log('Update projects triggered')
-}
-
-onMounted(async () => {
-  if (!profileStore.user) {
-    try {
-      await profileStore.fetchProfile()
-    } catch (error) {
-      console.error('Error fetching profile:', error)
-    }
-  }
-})
-import { ref } from 'vue'
-import { useProjectStore } from '@/stores/project';
-
 const projectStore = useProjectStore()
 
-const projectTitle = ref('');
-const projectLink = ref('');  
+/* ===== DATA ===== */
+const isOwnProfile = computed(() => {
+  return profileStore.viewUser === null
+})
 
-const projectUpdate = ref(false);
-function UpdateProject() {
-  projectUpdate.value = true;
-}
-function closeProjectUpdate(){
-  projectUpdate.value = false;
+const projects = computed(() => profileStore.user?.projects || [])
+const viewProjects = computed(() => profileStore.viewUser?.projects || [])
+
+const projectUpdate = ref(false)
+const projectTitle = ref('')
+const projectLink = ref('')
+const selectedProjectId = ref(null)
+
+const deleteModal = ref(false)
+const selectedProjectForDelete = ref(null)
+
+/* ===== HANDLERS ===== */
+const onCreate = () => {
+  console.log('Create project triggered')
 }
 
-function HandleUpdateProject(){
-  if(projectTitle.value === '' || projectLink.value === ''){
-    alert("Please fill in all fields")
-    return;
+const onUpdate = (project) => {
+  selectedProjectId.value = project.id
+  projectTitle.value = project.title || ''
+  projectLink.value = project.link || ''
+  projectUpdate.value = true
+}
+
+/* DELETE MODAL HANDLERS */
+const openDeleteModal = (project) => {
+  selectedProjectForDelete.value = project
+  deleteModal.value = true
+}
+
+const closeDeleteModal = () => {
+  deleteModal.value = false
+  selectedProjectForDelete.value = null
+}
+
+const confirmDeleteProject = async () => {
+  try {
+    await projectStore.DeleteProject(selectedProjectForDelete.value.id)
+    await profileStore.fetchProfile()
+    closeDeleteModal()
+  } catch (error) {
+    console.error('Failed to delete project:', error)
   }
+}
 
-  try{
-    projectStore.UpdateProject({
+/* UPDATE HANDLERS */
+const closeProjectUpdate = () => {
+  projectUpdate.value = false
+  selectedProjectId.value = null
+  projectTitle.value = ''
+  projectLink.value = ''
+}
+
+const handleUpdateProject = async () => {
+  if (!projectTitle.value || !projectLink.value) return
+
+  try {
+    await projectStore.UpdateProject(selectedProjectId.value, {
       title: projectTitle.value,
-      link: projectLink.value
-    });
-    projectUpdate.value = false;
-    projectTitle.value = '';
-    projectLink.value = '';
-  } catch (error) {
-    console.log('Failed to Update Project:', error.response?.data);
-  }
+      link: projectLink.value,
+    })
 
-}
-
-function DeleteProject(){
-  try{
-    projectStore.DeleteProject();
+    await profileStore.fetchProfile()
+    closeProjectUpdate()
   } catch (error) {
-    console.log('Failed to Delete Project:', error.response?.data);
+    console.error('Failed to update project:', error)
   }
 }
 
+/* ===== LIFECYCLE ===== */
+onMounted(async () => {
+  if (!profileStore.user) {
+    await profileStore.fetchProfile()
+  }
+})
 </script>
-
-<style scoped>
-.project-card {
-  padding: 16px;
-  background: #f9fafb;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  margin-bottom: 12px;
-}
-
-.project-card:last-child {
-  margin-bottom: 0;
-}
-
-.info-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.info-row:last-child {
-  margin-bottom: 0;
-}
-
-.info-row.title-row {
-  margin-bottom: 10px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.icon {
-  font-size: 1rem;
-  color: #000;
-  width: 20px;
-  text-align: center;
-  flex-shrink: 0;
-}
-
-.project-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin: 0;
-}
-
-.project-link {
-  font-size: 0.875rem;
-  color: #2563eb;
-  text-decoration: none;
-  word-break: break-all;
-}
-
-.project-link:hover {
-  text-decoration: underline;
-  color: #1d4ed8;
-}
-
-.no-data {
-  padding: 16px;
-  text-align: center;
-  color: #6b7280;
-}
-
-.no-data p {
-  margin: 0;
-  font-size: 0.875rem;
-}
-</style>
-
