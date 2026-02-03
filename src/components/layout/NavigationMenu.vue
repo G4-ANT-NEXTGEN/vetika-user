@@ -21,32 +21,39 @@
     <!-- Navigation Links -->
     <div class="nav-menu">
 
-      <router-link :to="{ name: 'home' }" class="nav-item" active-class="active" @click="$emit('close')">
-        <i class="bi bi-house-door"></i>
-        <span>Home</span>
-      </router-link>
+      <div>
+        <router-link :to="{ name: 'home' }" class="nav-item" active-class="active" @click="$emit('close')">
+          <i class="bi bi-house-door"></i>
+          <span>Home</span>
+        </router-link>
 
-      <!-- Messages - Mobile Only -->
-      <router-link :to="{ name: 'chat-layout' }" class="nav-item d-lg-none" active-class="active"
-        @click="$emit('close')">
-        <i class="bi bi-chat-dots"></i>
-        <span>Messages</span>
-      </router-link>
+        <!-- Messages - Mobile Only -->
+        <router-link :to="{ name: 'chat-layout' }" class="nav-item d-lg-none" active-class="active"
+          @click="$emit('close')">
+          <i class="bi bi-chat-dots"></i>
+          <span>Messages</span>
+        </router-link>
 
-      <router-link :to="{ name: 'about' }" class="nav-item" active-class="active" @click="$emit('close')">
-        <i class="bi bi-info-circle"></i>
-        <span>About</span>
-      </router-link>
+        <router-link :to="{ name: 'about' }" class="nav-item" active-class="active" @click="$emit('close')">
+          <i class="bi bi-info-circle"></i>
+          <span>About</span>
+        </router-link>
 
-      <router-link :to="{ name: 'help' }" class="nav-item" active-class="active" @click="$emit('close')">
-        <i class="bi bi-question-circle"></i>
-        <span>Help</span>
-      </router-link>
+      </div>
 
-      <router-link :to="{ name: 'contact' }" class="nav-item" active-class="active" @click="$emit('close')">
-        <i class="bi bi-headset"></i>
-        <span>Contact</span>
-      </router-link>
+
+      <div>
+        <router-link :to="{ name: 'help' }" class="nav-item" active-class="active" @click="$emit('close')">
+          <i class="bi bi-question-circle"></i>
+          <span>Help</span>
+        </router-link>
+
+        <router-link :to="{ name: 'contact' }" class="nav-item" active-class="active" @click="$emit('close')">
+          <i class="bi bi-headset"></i>
+          <span>Contact</span>
+        </router-link>
+      </div>
+
     </div>
 
   </div>
@@ -93,9 +100,10 @@ defineOptions({
 
 .nav-menu-container {
   position: fixed;
+  ;
   left: 0;
   top: 0;
-  height: 100vh;
+  height: 94vh;
   width: 280px;
   background-color: var(--color-background);
   z-index: 1050;
@@ -107,6 +115,14 @@ defineOptions({
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transform: translateX(-100%);
   /* Hidden by default on mobile */
+}
+
+.nav-menu-container .nav-menu {
+  height: 90vh;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .nav-menu-container.open {
