@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import api from "@/api/api";
-import { showSuccess, showError, showWarning } from '@/utils/toast'
+import {showSuccess,showError} from '@/utils/toast'
 
 export const useProfileStore = defineStore("profile", () => {
   const user = ref(null);
@@ -70,14 +70,16 @@ export const useProfileStore = defineStore("profile", () => {
     isLoading.value = true
     try {
       const formData = new FormData()
-      formData.append('cv', paylaod)
-      const res = await api.post(`/api/profile/cv`, formData, {
-        headers: {
-          'Accept': 'application/pdf'
+        formData.append('cv', paylaod)
+
+       await api.post(`/api/profile/cv`, formData,{
+        headers:{
+          'Accept':'application/pdf',
+          "Content-Type": "multipart/form-data"
         }
       })
       showSuccess('CV Upload Successful')
-      return res
+
     }
     catch (e) {
       showError('Only *.pdf file!')
@@ -247,6 +249,7 @@ export const useProfileStore = defineStore("profile", () => {
     uploadCover,
     removeCover,
     uploadCv,
-    userProfile
+    userProfile,
+    addCollaboration
   };
 });
