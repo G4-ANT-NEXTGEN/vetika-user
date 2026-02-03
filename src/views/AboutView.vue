@@ -18,7 +18,7 @@
             <div class="hero-badge reveal-scroll reveal-up">Since 2026</div>
             <h1 class="hero-title reveal-scroll reveal-up" style="transition-delay: 0.1s">
               Revolutionizing<br />
-              <span class="gradient-text">Website</span><br />
+              <span>Website</span><br />
               Communication
             </h1>
             <p class="hero-description reveal-scroll reveal-up" style="transition-delay: 0.2s">

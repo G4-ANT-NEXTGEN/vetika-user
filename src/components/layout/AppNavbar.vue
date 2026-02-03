@@ -172,7 +172,7 @@ authStore.fetchProfile()
   box-shadow: 0 2px 8px rgba(10, 10, 10, 0.15);
 }
 
-.logo-box:hover{
+.logo-box:hover {
   cursor: pointer;
 }
 
@@ -367,10 +367,21 @@ authStore.fetchProfile()
 
 }
 
+
+
 .action-item i {
   font-size: 1.1rem;
   color: var(--color-text) !important;
   transition: all 0.2s ease;
+}
+
+.action-item.router-link-active {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+.action-item.router-link-active i {
+  color: #ffffff !important;
 }
 
 .action-item.text-danger:hover {
