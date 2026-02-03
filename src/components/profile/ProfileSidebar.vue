@@ -1,7 +1,11 @@
 <template>
   <aside>
+    <!-- Show skeleton while loading -->
+    <InfoCardSkeleton v-if="isLoadingProfile" />
+
     <!-- ======== Personal Info - Only UPDATE ======== -->
     <InfoCard
+      v-else
       title="Personal"
       icon="bi bi-person"
       :showCreate="false"
@@ -48,8 +52,12 @@
       </template>
     </BaseModal>
 
+    <!-- Show skeleton while loading -->
+    <InfoCardSkeleton v-if="isLoadingProfile" />
+
     <!-- ======== Professional Info - Only UPDATE ======== -->
     <InfoCard
+      v-else
       title="Professional"
       icon="bi bi-briefcase"
       :showCreate="false"
@@ -94,8 +102,12 @@
       </template>
     </BaseModal>
 
+    <!-- Show skeleton while loading -->
+    <InfoCardSkeleton v-if="isLoadingProfile" />
+
     <!-- ======== Skills - UPDATE ======== -->
     <InfoCard
+      v-else
       title="Skills"
       icon="bi bi-lightning-charge"
       :showCreate="false"
@@ -132,8 +144,12 @@
       </template>
     </BaseModal>
 
+    <!-- Show skeleton while loading -->
+    <InfoCardSkeleton v-if="isLoadingProfile" />
+
     <!-- ======== Projects - CREATE, UPDATE, DELETE ======== -->
     <InfoCard
+      v-else
       title="Projects"
       icon="bi bi-folder2-open"
       :showCreate="true"
@@ -170,8 +186,12 @@
       </template>
     </BaseModal>
 
+    <!-- Show skeleton while loading -->
+    <InfoCardSkeleton v-if="isLoadingProfile" />
+
     <!-- ======== Education - CREATE, UPDATE, DELETE ======== -->
     <InfoCard
+      v-else
       title="Education"
       icon="bi bi-mortarboard"
       :showCreate="true"
@@ -262,20 +282,26 @@ import { useDegreeStore } from '@/stores/degrees'
 import { useSubjectStore } from '@/stores/subjects'
 import { useSkillStore } from '@/stores/skills'
 import { showSuccess, showError, showWarning } from '@/utils/toast'
+import InfoCardSkeleton from './InfoCardSkeleton.vue'
 
 const profileStore = useProfileStore()
+const isLoadingProfile = ref(true)
 
 onMounted(async () => {
   if (!profileStore.user) {
     try {
+      isLoadingProfile.value = true
       const data = await profileStore.fetchProfile()
       console.log('Fetched Profile Data:', data)
-      console.log('edu', await profileStore.user.educations[0].degree.name)
+      // console.log('edu', await profileStore.user.educations[0].degrees.name)
       // console.log(data.full_name)
     } catch (error) {
       console.error('Error fetching profile in header:', error)
+    } finally {
+      isLoadingProfile.value = false
     }
   } else {
+    isLoadingProfile.value = false
     console.log('Profile Data already in store:', profileStore.user)
   }
 })

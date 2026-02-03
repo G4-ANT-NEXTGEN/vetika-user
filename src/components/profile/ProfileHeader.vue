@@ -1,348 +1,380 @@
 <template>
-  <div class="profile-header-wrapper">
-    <!-- Cover -->
-    <div class="cover position-relative">
-      <img :src="profileStore.user?.cover" alt="Profile Cover" class="cover-img" />
-      <button class="btn btn-light btn-sm edit-cover" @click="openEditCover">
-        <i class="bi bi-pencil-square"></i>
-        Edit Cover Photo
+  <ProfileHeaderSkeleton v-if="profileStore.isLoading" />
+  <div v-else class="profile-header-wrapper">
+    <!-- Cover Section -->
+    <div class="cover-section">
+      <div class="cover-image-container">
+        <img :src="coverUrl" alt="Profile Cover" class="cover-img" />
+        <div class="cover-overlay"></div>
+      </div>
+
+      <button class="edit-cover-btn" @click="openEditCover">
+        <i class="bi bi-camera"></i>
+        <span>Edit Cover</span>
       </button>
-    </div>
 
-    <!-- Update Cover -->
-    <BaseModal v-if="editCover" title="Update Your Cover" size="lg" @close="closeEditCover">
-      <div class="cropper-container">
-        <Cropper
-          v-if="uploadedImage"
-          ref="cropperCoverRef"
-          :src="uploadedImage"
-          :stencil-props="{ aspectRatio: null, resizable: true }"
-          :stencil-component="CircleStencil"
-        />
-      </div>
-
-      <div class="mt-3">
-        <label for="imageUpload" class="btn"> Choose Image </label>
-        <input
-          id="imageUpload"
-          type="file"
-          class="d-none"
-          accept="image/*"
-          @change="handleFileSelect"
-        />
-      </div>
-      <div class="mt-3">
-        <label
-          for="deleteCover"
-          class="btn"
-          style="color: var(--color-danger)"
-          @click="deleteCover = true"
-        >
-          Delete Cover
-        </label>
-      </div>
-
-      <template #footer>
-        <base-button @click="cancelCrop" variant="secondary">Cancel</base-button>
-        <base-button
-          @click="applyChageCover"
-          :isLoading="profileStore.isLoading"
-          variant="dark"
-          style="color: var(--color-surface)"
-          ><span>{{ profileStore.isLoading ? 'Saving...' : 'Save' }}</span></base-button
-        >
-      </template>
-    </BaseModal>
-
-    <!-- Profile Content -->
-    <div class="container-fluid p-0">
-      <div class="profile-content px-3">
-        <!-- Avatar positioned to overlap cover -->
+      <!-- Avatar positioned over cover -->
+      <div class="avatar-container">
         <div class="avatar-wrapper">
-          <img class="avatar" :src="profileStore.user?.avatar" alt="Profile" />
-
-          <!-- Edit Avatar Button -->
-          <button class="avatar-edit" @click="showImageCropper = true">
+          <img class="avatar-image" :src="avatarUrl" alt="Profile Avatar" />
+          <button class="avatar-edit-btn" @click="showImageCropper = true">
             <i class="bi bi-camera"></i>
           </button>
         </div>
+      </div>
+    </div>
 
-        <!-- Crop Modal update avatar-->
-        <BaseModal
-          v-if="showImageCropper"
-          title="Crop Profile Image"
-          @close="showImageCropper = false"
-        >
-          <div class="cropper-container">
-            <Cropper
-              v-if="uploadedImage"
-              ref="cropperRef"
-              :src="uploadedImage"
-              :stencil-props="{ aspectRatio: 1 }"
-              :stencil-component="CircleStencil"
-            />
+    <!-- Update Cover Modal -->
+    <BaseModal v-if="editCover" title="Update Cover Photo" size="lg" @close="closeEditCover">
+      <div class="modal-content-wrapper">
+        <div class="cropper-container">
+          <Cropper
+            v-if="uploadedImage"
+            ref="cropperCoverRef"
+            :src="uploadedImage"
+            :stencil-props="{ aspectRatio: 16 / 5, resizable: true }"
+          />
+          <div v-else class="upload-placeholder">
+            <i class="bi bi-image"></i>
+            <p>Select an image to crop</p>
           </div>
+        </div>
 
-          <div class="mt-3">
-            <label for="imageUpload" class="btn"> Choose Image </label>
-            <input
-              id="imageUpload"
-              type="file"
-              class="d-none"
-              accept="image/*"
-              @change="handleFileSelect"
-            />
-          </div>
-          <div class="mt-3">
-            <label
-              for="imageDelete"
-              class="btn"
-              style="color: var(--color-danger)"
-              @click="deleteAvatar = true"
-            >
-              Delete Avatar
-            </label>
-            <!-- <input id="imageUpload" type="file" class="d-none" accept="image/*" @change="handleFileSelect" /> -->
-          </div>
+        <div class="modal-actions">
+          <label for="coverUpload" class="upload-btn">
+            <i class="bi bi-upload"></i>
+            Choose Image
+          </label>
+          <input
+            id="coverUpload"
+            type="file"
+            class="d-none"
+            accept="image/*"
+            @change="handleFileSelect"
+          />
 
-          <template #footer>
-            <base-button @click="showImageCropper = false" variant="secondary">Cancel</base-button>
-            <base-button
-              @click="applyCrop"
-              :isLoading="profileStore.isLoading"
-              variant="dark"
-              style="background-color: var(--color-surface)"
-              ><span>{{ profileStore.isLoading ? 'Saving...' : 'Save' }}</span></base-button
-            >
-          </template>
-        </BaseModal>
-        <!-- delete avatar modal  -->
-        <base-modal v-if="deleteAvatar" title="Delete Avatar">
-          <p>Are you sure!</p>
-          <template #footer>
-            <base-button @click="deleteAvatar = false" variant="secondary">Cancel</base-button>
-            <base-button
-              @click="handleAvatarDelete"
-              variant="dark"
-              :isLoading="profileStore.isLoading"
-              style="background-color: var(--color-danger)"
-              ><span>{{ profileStore.isLoading ? 'Saving...' : 'Save' }}</span></base-button
-            >
-          </template>
-        </base-modal>
-        <!-- delete cover modal  -->
-        <base-modal v-if="deleteCover" title="Delete Cover" @close="deleteCover = false">
-          <p>Are you sure!</p>
-          <template #footer>
-            <base-button @click="deleteCover = false" variant="secondary">Cancel</base-button>
-            <base-button
-              @click="handleDeleteCover"
-              variant="dark"
-              :isLoading="profileStore.isLoading"
-              style="background-color: var(--color-danger)"
-              ><span>{{ profileStore.isLoading ? 'Saving...' : 'Save' }}</span></base-button
-            >
-          </template>
-        </base-modal>
-
-        <!-- Info and Actions -->
-        <div class="info-section">
-          <div class="user-info">
-            <h4 class="user-name">{{ profileStore.user?.full_name || 'Loading...' }}</h4>
-            <small class="user-role">
-              {{ profileStore.user?.positions?.[0]?.name || 'Web Developer • Freelancer' }}
-            </small>
-          </div>
-
-          <div class="actions">
-            <button class="btn btn-outline" @click="openEditCV">
-              <i class="bi bi-file-earmark-richtext"></i>
-              Upload CV
-            </button>
-
-            <!-- Update CV -->
-            <BaseModal v-if="editCV" title="Upload Your CV" @close="editCV = false">
-              <div class="mb-3">
-                <!-- <label for="formFile" class="form-label">Upload Your CV</label>      -->
-                <div class="card-body ">
-                  <div class="upload-box mx-2 p-4">
-                    <div class="text-center w-100">
-                      <div class="upload-icon">
-                        <i class="bi bi-cloud-arrow-up"></i>
-                      </div>
-                      <div class="upload-text">
-                        Drop your files here or
-                        <label class="browse-link"
-                          ><input
-                            type="file"
-                            hidden
-
-                            @change="cvOnChangeFile"
-                           multiple
-                          />Browse</label
-                        >
-                        <p v-if="cvFile">{{ cvFile.name }}</p>
-                      </div>
-                      <div v-if="!cvFile" class="upload-limit">Max CV size 5 MB</div>
-                    </div>
-                  </div>
-                </div>
-                <!-- <BaseInput/> -->
-              </div>
-
-              <template #footer>
-                <button class="btn btn-outline-dark" @click="closeEditCV">Cancel</button>
-                <base-button
-                  class="btn btn-dark"
-                  @click="handleSaveCv"
-                  :isLoading="profileStore.isLoading"
-                  style="color: var(--color-surface)"
-                >
-                  <span>{{ profileStore.isLoading ? 'Saving...' : 'Save' }}</span>
-                </base-button>
-              </template>
-            </BaseModal>
-
-            <button class="btn btn-outline" @click="editCollaboration = true">
-              <i class="bi bi-people"></i>
-              Collaboration
-            </button>
-
-            <!-- Update Collaboration -->
-            <BaseModal
-              v-if="editCollaboration"
-              title="Upload Your Collaboration"
-              @close="editCollaboration =false"
-            >
-            <label for="formFile" class="form-label">Company Logo</label>
-            <div class="card-body">
-                  <div class="upload-box mx-2 pt-2 mb-3">
-                    <div class="text-center w-100">
-                      <div class="upload-icon">
-                        <i class="bi bi-cloud-arrow-up"></i>
-                      </div>
-                      <div class="upload-text">
-                        Drop your files here or
-                        <label class="browse-link"
-                          ><input
-
-                            type="file"
-                            hidden
-                            @change="onCompanyLogoChange"
-                           multiple
-                          />Browse</label
-                        >
-                        <p v-if="companyLogo">{{ companyLogo.name }}</p>
-                      </div>
-                      <div v-if="!companyLogo" class="upload-limit">Max CV size 5 MB</div>
-                    </div>
-                  </div>
-                </div>
-                <label for="formFile" class="form-label">Company Link</label>
-                <div class="mx-2">
-
-                  <base-input  v-model="companyLink"></base-input>
-                </div>
-
-              <template #footer>
-                <base-button class="btn btn-outline-dark" @click="editCollaboration = false">Cancel</base-button>
-                <base-button class="btn btn-dark" @click="HandleEditCollaboration" style="color:var(--color-surface)">Save Changes</base-button>
-              </template>
-            </BaseModal>
-
-            <base-button class="btn btn-icon" @click="seting = true">
-              <i class="bi bi-gear"></i>
-            </base-button>
-
-            <!-- Modal Change Password And Delete Account -->
-            <BaseModal v-if="seting" title="Account Settings" @close="seting = false">
-              <!-- Tabs -->
-              <div class="setting-tabs">
-                <button
-                  :class="['tab', { active: settingTab === 'password' }]"
-                  @click="settingTab = 'password'"
-                >
-                  Change Password
-                </button>
-                <button
-                  :class="['tab danger', { active: settingTab === 'delete' }]"
-                  @click="settingTab = 'delete'"
-                >
-                  Delete Account
-                </button>
-              </div>
-
-              <!-- Tab Content -->
-              <div class="tab-content">
-                <!-- Change Password -->
-                <div v-if="settingTab === 'password'">
-                  <form @submit.prevent="changePassword">
-
-                    <div class="mb-3 position-relative">
-                    <BaseInput @input="validateCurrentPassword" v-model="currentPass" :type="showCurrentPass ? 'text' : 'password'"
-                      :error="errors.currentPass" id="password-input" placeholder="Enter your password" label="Current Password" />
-                    <i class="bi" :class="showPass ? 'bi-eye-slash' : 'bi-eye'" @click="showCurrentPass = !showCurrentPass"
-                      style="cursor: pointer; position: absolute; right: 20px; top: 65px; transform: translateY(-50%);"></i>
-                  </div>
-                     <div class="mb-3 position-relative">
-                    <BaseInput @input="validatePassword" v-model="newPass" :type="showNewPass ? 'text' : 'password'"
-                      :error="errors.newPass" id="password-input" placeholder="Enter your password" label="New Password" />
-                    <i class="bi" :class="showPass ? 'bi-eye-slash' : 'bi-eye'" @click="showNewPass = !showNewPass"
-                      style="cursor: pointer; position: absolute; right: 20px; top: 65px; transform: translateY(-50%);"></i>
-                  </div>
-                    <div class="mb-3 position-relative">
-                    <BaseInput @blur="validateComfirmPassword" v-model="comfirmPass" :type="showComfirmPass ? 'text' : 'password'"
-                      :error="errors.comfirmPass" id="password-input" placeholder="Enter your password" label="Comfirm Password" />
-                    <i class="bi" :class="showPass ? 'bi-eye-slash' : 'bi-eye'" @click="showComfirmPass = !showComfirmPass"
-                      style="cursor: pointer; position: absolute; right: 20px; top: 65px; transform: translateY(-50%);"></i>
-                  </div>
-                  <div class="footer">
-                    <base-button class="btn" type="submit" variant="secondary">Update Password</base-button>
-                  </div>
-                  </form>
-
-                </div>
-
-                <!-- Delete Account -->
-                <div v-else>
-                  <div class="warning-box">
-                    ⚠️ <strong>Warning:</strong> This action cannot be undone. Deleting your account
-                    will permanently remove all data.
-                  </div>
-
-                  <BaseInput label="Type DELETE to confirm" />
-
-                  <div class="footer">
-                    <base-button class="btn btn-danger">Delete My Account</base-button>
-                  </div>
-                </div>
-              </div>
-            </BaseModal>
-          </div>
+          <button class="delete-btn" @click="deleteCover = true">
+            <i class="bi bi-trash"></i>
+            Remove Cover
+          </button>
         </div>
       </div>
 
-      <!-- Tabs -->
-      <div class="profile-tabs">
-        <button
-          v-for="tab in tabs"
-          :key="tab.key"
-          :class="['tab-btn', { active: activeTab === tab.key }]"
-          @click="$emit('change-tab', tab.key)"
+      <template #footer>
+        <base-button @click="closeEditCover" variant="secondary">Cancel</base-button>
+        <base-button @click="applyChageCover" :isLoading="profileStore.isLoading" variant="primary">
+          <span>{{ profileStore.isLoading ? 'Saving...' : 'Save Changes' }}</span>
+        </base-button>
+      </template>
+    </BaseModal>
+
+    <!-- Crop Avatar Modal -->
+    <BaseModal
+      v-if="showImageCropper"
+      title="Update Profile Photo"
+      @close="showImageCropper = false"
+    >
+      <div class="modal-content-wrapper">
+        <div class="cropper-container circle">
+          <Cropper
+            v-if="uploadedImage"
+            ref="cropperRef"
+            :src="uploadedImage"
+            :stencil-props="{ aspectRatio: 1 }"
+            :stencil-component="CircleStencil"
+          />
+          <div v-else class="upload-placeholder">
+            <i class="bi bi-person-circle"></i>
+            <p>Select a photo to crop</p>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <label for="avatarUpload" class="upload-btn">
+            <i class="bi bi-upload"></i>
+            Choose Photo
+          </label>
+          <input
+            id="avatarUpload"
+            type="file"
+            class="d-none"
+            accept="image/*"
+            @change="handleFileSelect"
+          />
+
+          <button class="delete-btn" @click="deleteAvatar = true">
+            <i class="bi bi-trash"></i>
+            Remove Photo
+          </button>
+        </div>
+      </div>
+
+      <template #footer>
+        <base-button @click="showImageCropper = false" variant="secondary">Cancel</base-button>
+        <base-button @click="applyCrop" :isLoading="profileStore.isLoading" variant="primary">
+          <span>{{ profileStore.isLoading ? 'Saving...' : 'Save Changes' }}</span>
+        </base-button>
+      </template>
+    </BaseModal>
+
+    <!-- Delete Avatar Confirmation -->
+    <base-modal v-if="deleteAvatar" title="Remove Profile Photo">
+      <div class="confirmation-content">
+        <div class="warning-icon">
+          <i class="bi bi-exclamation-triangle"></i>
+        </div>
+        <p>Are you sure you want to remove your profile photo?</p>
+      </div>
+
+      <template #footer>
+        <base-button @click="deleteAvatar = false" variant="secondary">Cancel</base-button>
+        <base-button
+          @click="handleAvatarDelete"
+          variant="danger"
+          :isLoading="profileStore.isLoading"
         >
-          {{ tab.label }}
+          <span>{{ profileStore.isLoading ? 'Removing...' : 'Remove' }}</span>
+        </base-button>
+      </template>
+    </base-modal>
+
+    <!-- Delete Cover Confirmation -->
+    <base-modal v-if="deleteCover" title="Remove Cover Photo" @close="deleteCover = false">
+      <div class="confirmation-content">
+        <div class="warning-icon">
+          <i class="bi bi-exclamation-triangle"></i>
+        </div>
+        <p>Are you sure you want to remove your cover photo?</p>
+      </div>
+
+      <template #footer>
+        <base-button @click="deleteCover = false" variant="secondary">Cancel</base-button>
+        <base-button
+          @click="handleDeleteCover"
+          variant="danger"
+          :isLoading="profileStore.isLoading"
+        >
+          <span>{{ profileStore.isLoading ? 'Removing...' : 'Remove' }}</span>
+        </base-button>
+      </template>
+    </base-modal>
+
+    <!-- Profile Info & Actions -->
+    <div class="profile-info-section">
+      <div class="profile-info">
+        <h1 class="user-name">{{ profileStore.user?.full_name || 'Loading...' }}</h1>
+        <p class="user-role">
+          {{ profileStore.user?.positions?.[0]?.name || 'Web Development' }}
+        </p>
+      </div>
+
+      <div class="profile-actions">
+        <button class="profile-btn" @click="openEditCV">
+          <i class="bi bi-file-earmark-arrow-up"></i>
+          <span>Upload CV</span>
+        </button>
+
+        <button class="profile-btn" @click="openEditCollaboration">
+          <i class="bi bi-people"></i>
+          <span>Collaboration</span>
+        </button>
+
+        <button class="profile-btn icon-only" @click="openChangePassAndDeleteAcc">
+          <i class="bi bi-gear"></i>
         </button>
       </div>
+    </div>
+
+    <!-- Upload CV Modal -->
+    <BaseModal v-if="editCV" title="Upload Your CV" @close="closeEditCV">
+      <div class="upload-section">
+        <div class="file-upload-area" :class="{ 'has-file': cvFile }">
+          <input
+            class="file-input"
+            type="file"
+            id="cvFile"
+            @change="cvOnChangeFile"
+            accept="application/pdf"
+          />
+          <label for="cvFile" class="file-upload-label">
+            <div class="upload-icon">
+              <i class="bi bi-cloud-arrow-up"></i>
+            </div>
+            <div class="upload-text">
+              <span class="primary-text">Drop your CV here or click to browse</span>
+              <span class="secondary-text">PDF files only • Max 10MB</span>
+            </div>
+          </label>
+        </div>
+
+        <div v-if="cvFile" class="file-preview">
+          <div class="file-icon">
+            <i class="bi bi-file-earmark-pdf"></i>
+          </div>
+          <div class="file-info">
+            <span class="file-name">{{ cvFile.name }}</span>
+            <span class="file-size">{{ formatFileSize(cvFile.size) }}</span>
+          </div>
+          <button @click="cvFile = null" class="remove-file">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <template #footer>
+        <base-button @click="closeEditCV" variant="secondary">Cancel</base-button>
+        <base-button
+          @click="handleSaveCv"
+          :isLoading="profileStore.isLoading"
+          variant="primary"
+          :disabled="!cvFile"
+        >
+          <span>{{ profileStore.isLoading ? 'Uploading...' : 'Upload CV' }}</span>
+        </base-button>
+      </template>
+    </BaseModal>
+
+    <!-- Collaboration Modal -->
+    <BaseModal v-if="editCollaboration" title="Add Collaboration" @close="closeEditCollaboration">
+      <div class="collaboration-form">
+        <div class="form-group">
+          <label class="form-label">Company Logo</label>
+          <div class="file-upload-area small">
+            <input class="file-input" type="file" id="collabFile" accept="image/*" />
+            <label for="collabFile" class="file-upload-label">
+              <i class="bi bi-image"></i>
+              <span>Upload Logo</span>
+            </label>
+          </div>
+        </div>
+
+        <BaseInput label="Company Name" placeholder="Enter company name" />
+        <BaseInput label="Company Website" placeholder="https://example.com" />
+        <BaseInput label="Collaboration Type" placeholder="e.g., Partnership, Client" />
+      </div>
+
+      <template #footer>
+        <base-button @click="closeEditCollaboration" variant="secondary">Cancel</base-button>
+        <base-button @click="HandleEditCollaboration" variant="primary">
+          Add Collaboration
+        </base-button>
+      </template>
+    </BaseModal>
+
+    <!-- Settings Modal -->
+    <BaseModal v-if="openSetting" title="Account Settings" @close="closeSetting" size="lg">
+      <div class="settings-container">
+        <!-- Settings Tabs -->
+        <div class="settings-tabs">
+          <button
+            :class="['settings-tab', { active: settingTab === 'password' }]"
+            @click="settingTab = 'password'"
+          >
+            <i class="bi bi-shield-lock"></i>
+            <span>Security</span>
+          </button>
+          <button
+            :class="['settings-tab danger', { active: settingTab === 'delete' }]"
+            @click="settingTab = 'delete'"
+          >
+            <i class="bi bi-exclamation-triangle"></i>
+            <span>Danger Zone</span>
+          </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="settings-content">
+          <!-- Change Password Tab -->
+          <div v-if="settingTab === 'password'" class="password-section">
+            <div class="section-header">
+              <h3>Change Password</h3>
+              <p>Update your password to keep your account secure</p>
+            </div>
+
+            <div class="form-group">
+              <BaseInput
+                label="Current Password"
+                type="password"
+                placeholder="Enter current password"
+              />
+            </div>
+
+            <div class="form-group">
+              <BaseInput label="New Password" type="password" placeholder="Enter new password" />
+            </div>
+
+            <div class="form-group">
+              <BaseInput
+                label="Confirm New Password"
+                type="password"
+                placeholder="Confirm new password"
+              />
+            </div>
+
+            <div class="password-requirements">
+              <span class="requirements-title">Password must contain:</span>
+              <ul>
+                <li>At least 8 characters</li>
+                <li>One uppercase letter</li>
+                <li>One number</li>
+              </ul>
+            </div>
+
+            <div class="form-actions">
+              <base-button variant="primary">Update Password</base-button>
+            </div>
+          </div>
+
+          <!-- Delete Account Tab -->
+          <div v-else class="delete-section">
+            <div class="danger-zone">
+              <div class="danger-icon">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+              </div>
+              <div class="danger-content">
+                <h3>Delete Account</h3>
+                <p>
+                  Once you delete your account, there is no going back. All your data including
+                  profile, projects, and settings will be permanently removed.
+                </p>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <BaseInput label="Type 'DELETE' to confirm" placeholder="DELETE" />
+            </div>
+
+            <div class="form-actions">
+              <base-button variant="danger">
+                <i class="bi bi-trash"></i>
+                <span>Permanently Delete Account</span>
+              </base-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </BaseModal>
+
+    <!-- Navigation Tabs -->
+    <div class="profile-nav-tabs">
+      <button
+        v-for="tab in tabs"
+        :key="tab.key"
+        :class="['nav-tab', { active: activeTab === tab.key }]"
+        @click="$emit('change-tab', tab.key)"
+      >
+        {{ tab.label }}
+      </button>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, computed, ref } from 'vue'
 import { useProfileStore } from '@/stores/profile'
 import { Cropper } from 'vue-advanced-cropper'
-import { useRequiredValidator } from '@/composables/useRequiredValidator';
-import { usePasswordValidator } from '@/composables/usePasswordValidator';
+import ProfileHeaderSkeleton from '@/components/profile/ProfileHeaderSkeleton.vue'
+import 'vue-advanced-cropper/dist/style.css'
 
 defineProps({
   activeTab: {
@@ -353,6 +385,8 @@ defineProps({
 
 defineEmits(['change-tab'])
 
+const profileStore = useProfileStore()
+
 
 const tabs = [
   { key: 'overview', label: 'Overview' },
@@ -361,67 +395,24 @@ const tabs = [
   { key: 'project', label: 'Project' },
   { key: 'cv', label: 'CV' },
 ]
-const {errors,validateField} =useRequiredValidator()
-const { validatePassword: checkPassword, validatePasswordMatch } = usePasswordValidator()
-const profileStore = useProfileStore()
-const image = ref(null)
+
 const cropperRef = ref()
 const cropperCoverRef = ref(null)
 const showImageCropper = ref(false)
 const deleteAvatar = ref(false)
 const deleteCover = ref(false)
 const uploadedImage = ref(null)
-const cvFile = ref()
-const companyLogo = ref()
-const seting = ref(false)
-const password = ref()
-const showCurrentPass = ref(false)
-const showNewPass = ref(false)
-const showComfirmPass = ref(false)
-const currentPass=ref()
-const newPass=ref()
-const comfirmPass=ref()
+const editCover = ref(false)
+const editCV = ref(false)
+const editCollaboration = ref(false)
+const openSetting = ref(false)
+const settingTab = ref('password')
+const cvFile = ref(null)
 
 onMounted(async () => {
   await profileStore.fetchProfile()
 })
-const validateCurrentPassword = () => {
-    if (!currentPass.value) {
-        errors.currentPass = 'Current Password is required'
-        return false
-    }
-    errors.currentPass = ''
-    return true
-}
-const validatePassword = () => {
-    const result = checkPassword(newPass.value)
-    errors.newPass = result.message
-    return result.isValid
-}
-const validateComfirmPassword = () => {
-    if (!comfirmPass.value) {
-        errors.comfirmPass = 'Confirm Password is required'
-        return false
-    }
-    errors.comfirmPass = ''
-    return true
-}
 
-const validateForm = () => {
-    const currentPassValid = validateCurrentPassword()
-    const passwordValid = validatePassword()
-    const comfirmPasswordValid = validateComfirmPassword()
-
-    let isValid = passwordValid && comfirmPasswordValid && currentPassValid
-
-    if (isValid && newPass.value !== comfirmPass.value) {
-        const matchResult = validatePasswordMatch(newPass.value, comfirmPass.value)
-        errors.comfirmPass = matchResult.message
-        isValid = false
-    }
-
-    return isValid
-}
 const handleFileSelect = (e) => {
   const file = e.target.files[0]
   if (!file) return
@@ -434,15 +425,14 @@ const handleFileSelect = (e) => {
 const applyCrop = async () => {
   const canvas = cropperRef.value.getResult().canvas
   const avatar = canvas.toDataURL('image/jpeg', 0.9)
-  console.log(avatar)
   await profileStore.uploadAvatarBase64(avatar)
   showImageCropper.value = false
   uploadedImage.value = null
 }
+
 const applyChageCover = async () => {
   const canvas = cropperCoverRef.value.getResult().canvas
   const cover = canvas.toDataURL('image/jpeg', 0.9)
-  console.log(cover)
   await profileStore.uploadCoverBase64(cover)
   editCover.value = false
   uploadedImage.value = null
@@ -451,221 +441,111 @@ const applyChageCover = async () => {
 const handleDeleteCover = async () => {
   editCover.value = false
   await profileStore.removeCover()
-  if (!(await profileStore.isLoading)) deleteCover.value = false
+  if (!profileStore.isLoading) deleteCover.value = false
 }
 
-const companyLink = ref()
-const onCompanyLogoChange = (e) =>{
-  const logo = e.target.files[0]
-  if(!logo) return
-  companyLogo.value=logo
+const handleAvatarDelete = async () => {
+  showImageCropper.value = false
+  await profileStore.removeAvatar()
+  if (!profileStore.isLoading) {
+    deleteAvatar.value = false
+  }
 }
 
 const cvOnChangeFile = (e) => {
   const cv = e.target.files[0]
   if (!cv) return
   if (cv.type !== 'application/pdf') {
-    alert('Only PDF allowed')
+    alert('Only PDF files are allowed')
+    return
+  }
+  if (cv.size > 10 * 1024 * 1024) {
+    alert('File size must be less than 10MB')
     return
   }
   cvFile.value = cv
 }
 
-const changePassword = () =>{
-  validateForm()
-  alert(`current p :${currentPass.value} new p : ${newPass.value} comf p : ${comfirmPass.value}`)
-}
 const handleSaveCv = async () => {
   if (!cvFile.value) return
   await profileStore.uploadCv(cvFile.value)
   console.log('this is cv file : ',cvFile.value)
   editCV.value = false
-  cvFile.value=null
+  cvFile.value = null
 }
 
-onMounted(async () => {
-  await profileStore.fetchProfile()
-  console.table(profileStore.user)
-})
-
-const editAvatar = ref(false)
-
-function openAvatarModal() {
-  editAvatar.value = true
-}
-function closeAvatarModal() {
-  editAvatar.value = false
+const formatFileSize = (bytes) => {
+  if (bytes < 1024) return bytes + ' B'
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
 }
 
-async function handleAvatarUpload(event) {
-  const file = event.target.files[0]
-  if (!file) return
-
-  try {
-    await profileStore.uploadAvatar(file)
-    editAvatar.value = false
-  } catch (error) {
-    console.error('Failed to upload avatar:', error)
-  }
-}
-
-const handleAvatarDelete = async () => {
-  showImageCropper.value = false
-  await profileStore.removeAvatar()
-  if (!(await profileStore.isLoading)) {
-    deleteAvatar.value = false
-  }
-}
-
-const editCover = ref(false)
 function openEditCover() {
   editCover.value = true
 }
+
 function closeEditCover() {
   editCover.value = false
-}
-const HandleEditCover = () => {
-  alert('Successfully')
-  editCover.value = false
+  uploadedImage.value = null
 }
 
-const editCV = ref(false)
 function openEditCV() {
   editCV.value = true
 }
+
 function closeEditCV() {
   editCV.value = false
-}
-const HandleEditCV = () => {
-  alert('Successfully')
-  editCV.value = false
+  cvFile.value = null
 }
 
-const editCollaboration = ref(false)
 function openEditCollaboration() {
   editCollaboration.value = true
 }
+
 function closeEditCollaboration() {
   editCollaboration.value = false
 }
-const onChangeCompanyLogo = (e) =>{
-  const logo = e.target.files[0]
-  if(!logo) return
-  companyLogo.value=logo
 
-}
-const HandleEditCollaboration = async() => {
-  const companyLink = ref()
-  const formData = new FormData()
-  formData.append('company_logo',companyLogo.value)
-  formData.append('company_link',companyLink.value)
-  await profileStore.addCollaboration(formData)
-  console.log(await profileStore.addCollaboration(formData))
+function HandleEditCollaboration() {
+  alert('Collaboration added successfully')
   editCollaboration.value = false
 }
 
-const openSetting = ref(false)
 function openChangePassAndDeleteAcc() {
   openSetting.value = true
 }
+
 function closeSetting() {
   openSetting.value = false
+  settingTab.value = 'password'
 }
-
-const settingTab = ref('password') // 'password' | 'delete'
-
-onMounted(async () => {
-  if (!profileStore.user) {
-    try {
-      const data = await profileStore.fetchProfile()
-      console.log('Fetched Profile Data:', data)
-      console.log(data.full_name)
-    } catch (error) {
-      console.error('Error fetching profile in header:', error)
-    }
-  } else {
-    console.log('Profile Data already in store:', profileStore.user)
-  }
-})
 </script>
 
 <style scoped>
+/* ====================================
+   MAIN WRAPPER
+   ==================================== */
 .profile-header-wrapper {
-  background: var(--color-accent);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  margin-bottom: 0;
-  border-radius: 10px;
+  background: var(--color-surface);
+  border-radius: 16px;
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 24px;
 }
 
-.avatar-wrapper {
+/* ====================================
+   COVER SECTION
+   ==================================== */
+.cover-section {
   position: relative;
-  width: fit-content;
-}
-
-.avatar-edit {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: none;
+  height: 240px;
   background: var(--color-accent);
-  color: var(--color-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-.avatar-edit:hover {
-  opacity: 0.9;
-}
-
-/* Avatar modal actions */
-.avatar-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.avatar-action {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  background: var(--color-accent);
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.avatar-action.upload:hover {
-  background: var(--bg-hover);
-}
-
-.avatar-action.delete {
-  color: var(--toastify-color-error);
-  border-color: var(--toastify-color-error);
-}
-
-.avatar-action.delete:hover {
-  background: rgba(239, 68, 68, 0.12);
-}
-
-.cover,
-img {
+.cover-image-container {
+  position: relative;
   width: 100%;
-  height: 400px;
-  /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
-  /* background-image: url('../../assets/R.png'); */
-  background-size: cover;
-  background-position: center;
-  position: relative;
-
+  height: 100%;
 }
 
 .cover-img {
@@ -675,229 +555,641 @@ img {
   display: block;
 }
 
-.edit-cover {
+.cover-overlay {
   position: absolute;
-  right: 16px;
-  bottom: 16px;
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid var(--border-color);
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  color: white;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.3) 100%);
+  pointer-events: none;
+}
+
+.edit-cover-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
   display: flex;
   align-items: center;
   gap: 6px;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text);
   cursor: pointer;
   transition: all 0.2s ease;
-  backdrop-filter: blur(8px);
-}
-
-.edit-cover:hover {
-  background: var(--color-accent);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transform: translateY(-1px);
-  color: var(--color-text);
 }
 
-.profile-content {
-  position: relative;
+.edit-cover-btn:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.edit-cover-btn i {
+  font-size: 14px;
+}
+
+[data-theme='dark'] .edit-cover-btn {
+  background: rgba(40, 40, 40, 0.95);
+  color: #f8f8fc;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .edit-cover-btn:hover {
+  background: rgba(50, 50, 50, 1);
+}
+
+/* ====================================
+   AVATAR
+   ==================================== */
+.avatar-container {
+  position: absolute;
+  bottom: -50px;
+  left: 32px;
 }
 
 .avatar-wrapper {
   position: relative;
-  padding-top: 1rem;
 }
 
-.avatar {
-  width: 100px;
-  height: 100px;
+.avatar-image {
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  border: 4px solid var(--color-accent);
-  margin-top: -50px;
+  border: 4px solid var(--color-surface);
   object-fit: cover;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   background: var(--color-accent);
+  display: block;
 }
 
-.info-section {
+.avatar-edit-btn {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-surface);
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+  font-size: 12px;
+}
+
+.avatar-edit-btn:hover {
+  transform: scale(1.1);
+  background: var(--color-hover);
+}
+
+/* ====================================
+   PROFILE INFO & ACTIONS
+   ==================================== */
+.profile-info-section {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-top: 0.75rem;
-  gap: 1rem;
-  padding-bottom: 1rem;
+  align-items: center;
+  padding: 64px 32px 24px;
+  gap: 20px;
 }
 
-.user-info {
-  flex-grow: 1;
+.profile-info {
+  flex: 1;
 }
 
 .user-name {
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 24px;
+  font-weight: 700;
   color: var(--color-text);
-  margin: 0 0 2px 0;
+  margin: 0 0 4px 0;
+  letter-spacing: -0.5px;
 }
 
 .user-role {
-  color: var(--color-gray);
-  font-size: 13px;
+  font-size: 15px;
+  color: var(--color-muted);
+  margin: 0;
+  font-weight: 500;
 }
 
-.actions {
+.profile-actions {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
-.btn {
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 13px;
-  font-weight: 500;
+.profile-btn {
   display: flex;
   align-items: center;
   gap: 6px;
-}
-
-.btn-outline {
   padding: 8px 14px;
   border-radius: 6px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
   color: var(--color-text);
-  background: var(--color-accent);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
-.btn-outline:hover {
-  background: var(--color-primary);
-  border-color: var(--border-color-hover);
-  color: white;
+.profile-btn:hover {
+  background: var(--color-hover);
+  border-color: var(--color-primary);
 }
 
-.btn-icon {
+.profile-btn i {
+  font-size: 14px;
+}
+
+.profile-btn.icon-only {
   padding: 8px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  color: var(--color-primary);
-  background: var(--color-accent);
 }
 
-.btn-icon:hover {
-  background: var(--color-primary);
-  border-color: var(--border-color-hover);
-  color: white;
-}
-
-/* Add missing dark/outline-dark variants used in modal footer */
-.btn-outline-dark {
-  padding: 8px 14px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  color: var(--color-text);
-  background: var(--color-accent);
-}
-
-.btn-outline-dark:hover {
-  background: var(--color-primary);
-  border-color: var(--border-color-hover);
-  color: var(--color-text);
-}
-
-.btn-dark {
-  padding: 8px 14px;
-  border-radius: 6px;
-  border: none;
-  background: var(--color-primary);
-  color: var(--color-text);
-}
-
-.btn svg {
-  flex-shrink: 0;
-}
-
-.profile-tabs {
+/* ====================================
+   NAVIGATION TABS
+   ==================================== */
+.profile-nav-tabs {
   display: flex;
-  gap: 0.5rem;
-  border-top: 1px solid var(--border-color);
-  padding-top: 0;
+  gap: 0;
+  padding: 0 32px;
+  border-top: 1px solid var(--color-border);
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
-.tab-btn {
-  padding: 0.75rem 1rem;
+.profile-nav-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.nav-tab {
+  padding: 16px 24px;
   border: none;
   background: transparent;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--color-gray);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-muted);
   cursor: pointer;
   position: relative;
-  transition: color 0.2s;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
-.tab-btn:hover {
+.nav-tab:hover {
   color: var(--color-text);
 }
 
-.tab-btn.active {
+.nav-tab.active {
   color: var(--color-text);
 }
 
-.tab-btn.active::after {
+.nav-tab.active::after {
   content: '';
   position: absolute;
-  bottom: 0;
+  bottom: -1px;
   left: 0;
   right: 0;
   height: 2px;
   background: var(--color-text);
 }
 
-.setting-tabs {
+/* ====================================
+   MODAL STYLES
+   ==================================== */
+.modal-content-wrapper {
+  padding: 8px 0;
+}
+
+.cropper-container {
+  width: 100%;
+  height: 400px;
+  background: var(--color-accent);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid var(--color-border);
+}
+
+.cropper-container.circle {
+  height: 400px;
+}
+
+.upload-placeholder {
+  width: 100%;
+  height: 100%;
   display: flex;
-  border-bottom: 1px solid var(--border-color);
-  margin-bottom: 1rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--color-muted);
 }
 
-.setting-tabs .tab {
+.upload-placeholder i {
+  font-size: 64px;
+  opacity: 0.3;
+}
+
+.upload-placeholder p {
+  font-size: 15px;
+  margin: 0;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.upload-btn {
   flex: 1;
-  padding: 10px;
-  background: none;
-  border: none;
-  font-weight: 500;
-  cursor: pointer;
-  color: var(--color-gray);
-  border-bottom: 2px solid transparent;
-}
-
-.setting-tabs .tab.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: var(--color-surface);
   color: var(--color-text);
-  border-bottom-color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.setting-tabs .tab.danger.active {
-  color: var(--toastify-color-error);
-  border-bottom-color: var(--toastify-color-error);
+.upload-btn:hover {
+  background: var(--color-hover);
+  border-color: var(--color-primary);
 }
 
-.warning-box {
-  background: #fee2e2;
-  color: var(--toastify-color-error);
-  padding: 12px;
-  border-radius: 6px;
+.delete-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: var(--color-surface);
+  color: var(--color-danger);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.delete-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: var(--color-danger);
+}
+
+/* ====================================
+   CONFIRMATION MODAL
+   ==================================== */
+.confirmation-content {
+  padding: 20px 0;
+  text-align: center;
+}
+
+.warning-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 50%;
+  margin-bottom: 16px;
+}
+
+.warning-icon i {
+  font-size: 32px;
+  color: var(--color-danger);
+}
+
+.confirmation-content p {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ====================================
+   FILE UPLOAD SECTION
+   ==================================== */
+.upload-section {
+  padding: 8px 0;
+}
+
+.file-upload-area {
+  position: relative;
+  border: 2px dashed var(--color-border);
+  border-radius: 12px;
+  padding: 48px 24px;
+  text-align: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.file-upload-area:hover {
+  border-color: var(--color-primary);
+  background: var(--color-hover);
+}
+
+.file-upload-area.small {
+  padding: 24px;
+}
+
+.file-upload-area.has-file {
+  border-color: var(--color-primary);
+  background: var(--color-hover);
+}
+
+.file-input {
+  display: none;
+}
+
+.file-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.upload-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  color: var(--color-primary);
+  font-size: 24px;
+}
+
+.upload-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.primary-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.secondary-text {
   font-size: 13px;
-  margin-bottom: 12px;
+  color: var(--color-muted);
 }
 
-.btn-danger {
-  background: var(--toastify-color-error);
-  color: white;
-  padding: 8px 14px;
-  border-radius: 6px;
+.file-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: var(--color-accent);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  margin-top: 16px;
+}
+
+.file-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 8px;
+  color: var(--color-danger);
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.file-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.file-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-size {
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.remove-file {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
   border: none;
+  border-radius: 6px;
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.remove-file:hover {
+  background: var(--color-hover);
+  color: var(--color-danger);
+}
+
+/* ====================================
+   COLLABORATION FORM
+   ==================================== */
+.collaboration-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 8px 0;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* ====================================
+   SETTINGS MODAL
+   ==================================== */
+.settings-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.settings-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.settings-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 20px;
+  background: transparent;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-muted);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.settings-tab:hover {
+  color: var(--color-text);
+  background: var(--color-hover);
+}
+
+.settings-tab.active {
+  color: var(--color-text);
+}
+
+.settings-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--color-text);
+}
+
+.settings-tab.danger.active {
+  color: var(--color-danger);
+}
+
+.settings-tab.danger.active::after {
+  background: var(--color-danger);
+}
+
+.settings-content {
+  padding: 24px 0;
+}
+
+.section-header {
+  margin-bottom: 24px;
+}
+
+.section-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 8px 0;
+}
+
+.section-header p {
+  font-size: 14px;
+  color: var(--color-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.password-section,
+.delete-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.password-requirements {
+  padding: 16px;
+  background: var(--color-accent);
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+}
+
+.requirements-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.password-requirements ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.password-requirements li {
+  font-size: 13px;
+  color: var(--color-muted);
+  line-height: 1.8;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 8px;
+}
+
+/* ====================================
+   DANGER ZONE
+   ==================================== */
+.danger-zone {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  background: rgba(239, 68, 68, 0.05);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 12px;
+}
+
+.danger-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 10px;
+}
+
+.danger-icon i {
+  font-size: 24px;
+  color: var(--color-danger);
 }
 .upload-container {
   max-width: 600px;
@@ -953,26 +1245,145 @@ img {
   color: #999;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .info-section {
+.danger-content h3 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 8px 0;
+}
+
+.danger-content p {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ====================================
+   UTILITY CLASSES
+   ==================================== */
+.d-none {
+  display: none !important;
+}
+
+/* ====================================
+   RESPONSIVE DESIGN
+   ==================================== */
+@media (max-width: 968px) {
+  .profile-info-section {
     flex-direction: column;
+    align-items: flex-start;
+    padding: 64px 24px 20px;
   }
 
-  .actions {
+  .profile-actions {
     width: 100%;
   }
 
-  .btn-outline {
+  .profile-btn {
     flex: 1;
   }
 
-  .profile-tabs {
-    overflow-x: auto;
+  .profile-nav-tabs {
+    padding: 0 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .cover-section {
+    height: 200px;
   }
 
-  .tab-btn {
-    white-space: nowrap;
+  .avatar-container {
+    left: 20px;
+    bottom: -40px;
+  }
+
+  .avatar-image {
+    width: 100px;
+    height: 100px;
+  }
+
+  .avatar-edit-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 11px;
+  }
+
+  .profile-info-section {
+    padding: 52px 20px 20px;
+  }
+
+  .user-name {
+    font-size: 20px;
+  }
+
+  .user-role {
+    font-size: 14px;
+  }
+
+  .profile-actions {
+    flex-direction: column;
+  }
+
+  .profile-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .profile-nav-tabs {
+    padding: 0 20px;
+  }
+
+  .nav-tab {
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+
+  .edit-cover-btn {
+    top: 12px;
+    right: 12px;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .edit-cover-btn span {
+    display: none;
+  }
+
+  .cropper-container,
+  .cropper-container.circle {
+    height: 300px;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .settings-tabs {
+    flex-direction: column;
+    gap: 4px;
+    border-bottom: none;
+  }
+
+  .settings-tab {
+    justify-content: flex-start;
+  }
+
+  .settings-tab.active::after {
+    display: none;
+  }
+
+  .danger-zone {
+    flex-direction: column;
+  }
+
+  .form-actions {
+    justify-content: stretch;
+  }
+
+  .form-actions button {
+    width: 100%;
   }
 
 }
