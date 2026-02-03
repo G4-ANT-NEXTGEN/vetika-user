@@ -46,17 +46,7 @@
                         <input type="email" class="form-control" placeholder="jane@example.com" required>
                       </div>
                     </div>
-                    <div class="col-12">
-                      <div class="form-group-custom">
-                        <label class="form-label">Subject</label>
-                        <select class="form-select">
-                          <option selected>General Inquiry</option>
-                          <option>Support</option>
-                          <option>Feedback</option>
-                          <option>Business Partnership</option>
-                        </select>
-                      </div>
-                    </div>
+                    
                     <div class="col-12">
                       <div class="form-group-custom">
                         <label class="form-label">Message</label>
