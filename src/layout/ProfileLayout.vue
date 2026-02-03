@@ -1,24 +1,23 @@
 <template>
-  <div class="profile-page p-3">
-    <AppNavbar @toggle-menu="toggleMobileMenu" />
-    <!-- <NavigationMenu :isOpen="isMobileMenuOpen" @close="isMobileMenuOpen = false" /> -->
+  <div class="profile-page p-4">
+    <ProfileHeader ref="headerRef" :activeTab="activeTab" @change-tab="activeTab = $event" />
 
-    <ProfileHeader :activeTab="activeTab" @change-tab="activeTab = $event" />
-
-    <div class="profile-container">
-      <div class="profile-layout">
-        <!-- Sidebar -->
-        <aside class="profile-sidebar">
-          <ProfileSidebar />
-        </aside>
-
-        <!-- Main content -->
-        <main class="profile-content">
-          <div class="mb-3">
-            <h5>Post Card</h5>
-          </div>
-          <component :is="currentComponent" />
-        </main>
+    <div class="profile-main-container">
+      <div class="row g-4">
+        <div class="col-lg-4 col-xl-3">
+          <!-- Sidebar -->
+          <aside class="profile-sidebar-column">
+            <ProfileSidebar @open-cv="openHeaderCV" @open-collab="openHeaderCollab" />
+          </aside>
+        </div>
+        <div class="col-lg-8 col-xl-9">
+          <!-- Main content -->
+          <main class="profile-content-column">
+            <transition name="fade-slide" mode="out-in">
+              <component :is="currentComponent" />
+            </transition>
+          </main>
+        </div>
       </div>
     </div>
   </div>
@@ -27,8 +26,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 
-import AppNavbar from '@/components/layout/AppNavbar.vue'
-// import NavigationMenu from '@/components/layout/NavigationMenu.vue'
+
 import ProfileHeader from '@/components/profile/ProfileHeader.vue'
 import ProfileSidebar from '@/components/profile/ProfileSidebar.vue'
 
@@ -37,15 +35,13 @@ import ProfessionalInfo from '@/components/profile/sidebar/ProfessionalInfo.vue'
 import ProjectsInfo from '@/components/profile/sidebar/ProjectsInfo.vue'
 import EducationInfo from '@/components/profile/sidebar/EducationInfo.vue'
 import CVInfo from '@/components/profile/sidebar/CVInfo.vue'
-// import AppNavbar from '@/components/layout/AppNavbar.vue'
 
 
 const activeTab = ref('overview')
-const isMobileMenuOpen = ref(false)
+const headerRef = ref(null)
 
-const toggleMobileMenu = () => {
-  isMobileMenuOpen.value = !isMobileMenuOpen.value
-}
+const openHeaderCV = () => headerRef.value?.openEditCV()
+const openHeaderCollab = () => headerRef.value?.openEditCollaboration()
 
 const map = {
   overview: PersonalInfo,
@@ -60,43 +56,48 @@ const currentComponent = computed(() => map[activeTab.value])
 
 <style scoped>
 .profile-page {
-  background: var(--color-background);
   min-height: 100vh;
-  margin-top: 77px;
+  padding-bottom: 3rem;
+  background-color: var(--color-background);
 }
 
-.profile-container {
-  width: 100%;
+.profile-main-container {
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 1.5rem 0;
 }
 
-.profile-layout {
-  display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: 1rem;
-  align-items: start;
-}
-
-.profile-sidebar {
+.profile-sidebar-column {
+  position: sticky;
+  top: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1.5rem;
 }
 
-.profile-content {
-  min-height: 300px;
+.profile-content-column {
+  min-height: 500px;
 }
 
-@media (max-width: 968px) {
-  .profile-layout {
-    grid-template-columns: 1fr;
-  }
+/* Animations */
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.3s ease;
 }
 
-@media (max-width: 768px) {
-  .profile-container {
-    padding: 1rem;
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+@media (max-width: 991px) {
+  .profile-sidebar-column {
+    position: static;
+    margin-bottom: 2rem;
   }
 }
 </style>

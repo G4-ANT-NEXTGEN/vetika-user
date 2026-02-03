@@ -23,7 +23,7 @@
             <div class="col-lg-7">
               <div class="card contact-card border-0 p-4 p-md-5 h-100 reveal-left">
                 <div class="card-header-custom mb-4">
-                  <h3 class="fw-bold mb-2">Send us a Message</h3>
+                  <h3 class="fw-bold mb-2 contect-card-title">Send us a Message</h3>
                   <div class="header-line"></div>
                 </div>
                 <form @submit.prevent="submitForm">
@@ -46,7 +46,7 @@
                         <input type="email" class="form-control" placeholder="jane@example.com" required>
                       </div>
                     </div>
-                    
+
                     <div class="col-12">
                       <div class="form-group-custom">
                         <label class="form-label">Message</label>
@@ -54,11 +54,13 @@
                       </div>
                     </div>
                     <div class="col-12 pt-2">
-                      <button type="submit" class="btn btn-primary btn-lg w-100 send-btn">
-                        <span v-if="!isSubmitting">Send Message</span>
-                        <div v-else class="spinner-border spinner-border-sm" role="status"></div>
-                        <i class="bi bi-send-fill ms-2"></i>
-                      </button>
+                      <div class="d-flex justify-content-end">
+                        <BaseButton type="button" variant="primary" @click="submitForm" :isLoading="isSubmitting">
+                          <span v-if="!isSubmitting">Send Message</span>
+                          <div v-else class="spinner-border spinner-border-sm" role="status"></div>
+                          <i class="bi bi-send-fill ms-2"></i>
+                        </BaseButton>
+                      </div>
                     </div>
                   </div>
                 </form>
@@ -107,7 +109,7 @@
                     <div>
                       <h5 class="fw-bold mb-1">Call Us</h5>
                       <p class="text-secondary mb-0">
-                        +1 (555) 123-4567<br>
+                        096 4207 193<br>
                         Mon-Fri from 8am to 5pm
                       </p>
                     </div>
@@ -134,6 +136,7 @@
 </template>
 
 <script setup>
+import BaseButton from '@/components/ui/base/BaseButton.vue';
 import { ref } from 'vue';
 
 const isSubmitting = ref(false);
@@ -157,6 +160,10 @@ defineOptions({
   color: var(--color-text);
   min-height: 100%;
   padding-bottom: 3rem;
+}
+
+.contect-card-title {
+  color: var(--color-text);
 }
 
 /* Hero Styles */
@@ -262,7 +269,6 @@ defineOptions({
 }
 
 .info-card:hover {
-  transform: translateX(10px);
   border-color: var(--color-primary);
   box-shadow: var(--shadow-md);
 }
@@ -279,15 +285,15 @@ defineOptions({
 }
 
 .bg-primary-gradient {
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background-color: var(--color-text);
 }
 
 .bg-secondary-gradient {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  background-color: var(--color-text);
 }
 
 .bg-info-gradient {
-  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  background-color: var(--color-text);
 }
 
 /* Social Buttons */

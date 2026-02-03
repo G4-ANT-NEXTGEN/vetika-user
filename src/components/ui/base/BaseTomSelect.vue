@@ -52,40 +52,44 @@ onBeforeUnmount(() => tom?.destroy())
 
 /* input area */
 .ts-control {
-  background: #f8fafc;
-  /* modal input bg */
-  border: 1px solid #e5e7eb;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   min-height: 48px;
   padding: 6px 10px;
   box-shadow: none;
+  color: var(--color-text);
 }
 
 /* focus */
 .ts-control.focus {
-  border-color: var(--color-dark);
-  box-shadow: 0 0 0 2px rgba(31, 41, 55, 0.08);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme='dark'] .ts-control.focus {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.04);
 }
 
 /* placeholder */
 .ts-control input::placeholder {
-  color: var(--color-gray);
+  color: var(--color-text-tertiary);
   font-size: 0.9rem;
 }
 
 /* selected tag */
 .ts-control .item {
-  background: #eef2f7;
-  color: var(--color-dark);
+  background: var(--color-hover);
+  color: var(--color-text);
   border-radius: 10px;
   padding: 10px;
   font-size: 0.85rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
 }
 
 /* remove button */
 .ts-control .remove {
-  color: var(--color-gray);
+  color: var(--color-muted);
   font-size: 14px;
 }
 
@@ -93,26 +97,27 @@ onBeforeUnmount(() => tom?.destroy())
 .ts-dropdown {
   margin-top: 6px;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  background: #ffffff;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+  color: var(--color-text);
 }
 
 /* dropdown items */
 .ts-dropdown .option {
   padding: 12px 14px;
   font-size: 0.9rem;
-  color: var(--color-dark);
+  color: var(--color-text);
 }
 
 /* hover */
 .ts-dropdown .option.active {
-  background: #f1f5f9;
+  background: var(--color-hover);
 }
 
 /* selected */
 .ts-dropdown .option.selected {
-  background: #f8fafc;
+  background: var(--bg-tag);
   font-weight: 500;
 }
 
@@ -122,11 +127,11 @@ onBeforeUnmount(() => tom?.destroy())
 }
 
 .ts-dropdown-content::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: var(--color-border);
   border-radius: 10px;
 }
 
-.ts-wrapper.multi .ts-control>div {
+.ts-wrapper.multi .ts-control > div {
   padding: 6px !important;
 }
 </style>

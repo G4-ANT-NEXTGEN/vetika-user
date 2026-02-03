@@ -190,10 +190,10 @@ export const useProfileStore = defineStore("profile", () => {
           "Content-Type": "application/x-www-form-urlencoded",
         },
       });
-     
+
       if(!res.data.result){
         showError(res.data.message)
-        
+
         isProcessing.value=true
         return
       }

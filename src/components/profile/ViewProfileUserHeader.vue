@@ -1,56 +1,54 @@
 <template>
-  <div class="profile-header-wrapper">
-    <!-- Cover - Read Only -->
-    <div class="cover position-relative">
-      <!-- No edit button for read-only view -->
-    </div>
+  <div class="profile-header-wrapper" v-if="userData">
+    <!-- Cover & Identity Section -->
+    <div class="header-main">
+      <div class="cover-area">
+        <div v-if="!userData?.cover" class="cover-grid"></div>
+        <img v-else :src="userData?.cover" alt="Profile Cover" class="cover-image" />
+        <div class="cover-overlay"></div>
 
-    <!-- Profile Content -->
-    <div class="container-fluid p-0">
-      <div class="profile-content px-3">
-        <!-- Avatar - Read Only -->
-        <div class="avatar-wrapper">
-          <img class="avatar" :src="userData?.avatar || ''" alt="Profile" />
-          <!-- No edit button for read-only view -->
-        </div>
-
-        <!-- Info - Display Only -->
-        <div class="info-section">
-          <div class="user-info">
-            <h4 class="user-name">{{ userData?.full_name || 'User Name' }}</h4>
-            <small class="user-role"
-              >{{ userData?.professional?.job_title || 'Position' }} •
-              {{ userData?.professional?.company_name || 'Company' }}</small
-            >
+        <div class="identity-container">
+          <div class="avatar-box">
+            <div class="avatar-ring">
+              <img :src="userData?.avatar" alt="Profile Avatar" class="profile-avatar" />
+              <div class="status-indicator"></div>
+            </div>
           </div>
 
-          <!-- No action buttons for read-only view -->
-          <div class="actions" style="display: none"></div>
+          <div class="identity-details">
+            <h1 class="display-name">{{ userData?.full_name || 'Loading...' }}</h1>
+            <p class="role-text">{{ userData?.professional?.job_title || 'Freelancer' }}</p>
+          </div>
+
+          <div class="identity-actions">
+            <BaseButton variant="primary" class="chat-btn" @click="gotoMessage">
+              <i class="bi bi-chat-dots-fill"></i>
+              <span>Message</span>
+            </BaseButton>
+          </div>
         </div>
       </div>
 
-      <!-- Tabs -->
-      <div class="profile-tabs">
-        <button
-          v-for="tab in tabs"
-          :key="tab.key"
-          :class="['tab-btn', { active: activeTab === tab.key }]"
-          @click="$emit('change-tab', tab.key)"
-        >
-          {{ tab.label }}
-        </button>
+      <!-- Navigation Bar -->
+      <div class="header-nav">
+        <div class="nav-links">
+          <button v-for="tab in tabs" :key="tab.key" :class="['nav-link-btn', { active: activeTab === tab.key }]"
+            @click="$emit('change-tab', tab.key)">
+            {{ tab.label }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
+  <ProfileHeaderSkeleton v-else />
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useProfileStore } from '@/stores/profile'
+import ProfileHeaderSkeleton from './ProfileHeaderSkeleton.vue'
+import BaseButton from '@/components/ui/base/BaseButton.vue'
+import { useRouter } from 'vue-router'
 
-const profileStore = useProfileStore()
-
-defineProps({
+const props = defineProps({
   activeTab: {
     type: String,
     default: 'overview',
@@ -62,6 +60,13 @@ defineProps({
 })
 
 defineEmits(['change-tab'])
+const router = useRouter()
+
+const gotoMessage = () => {
+  if (props.userData?.id) {
+    router.push({ name: 'chat-room', params: { id: props.userData.id } })
+  }
+}
 
 const tabs = [
   { key: 'overview', label: 'Overview' },
@@ -73,182 +78,233 @@ const tabs = [
 </script>
 
 <style scoped>
+/* ====================================
+   MAIN HEADER CONTAINER
+   ==================================== */
 .profile-header-wrapper {
-  background: var(--color-accent);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  margin-bottom: 0;
-  border-radius: 10px;
+  margin-bottom: 2rem;
+  border-radius: 24px;
+  overflow: hidden;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ====================================
+   COVER AREA
+   ==================================== */
+.cover-area {
+  position: relative;
+  height: 380px;
+  background-color: var(--color-background);
   overflow: hidden;
 }
 
-.cover {
-  height: 400px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  background-image: url('../../assets/R.png');
-  background-size: cover;
-  background-position: center;
-  position: relative;
+.cover-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--color-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-border) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.5;
 }
 
-.profile-content {
-  position: relative;
-}
-
-.avatar-wrapper {
-  position: relative;
-  width: fit-content;
-  padding-top: 1rem;
-}
-
-.avatar {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  border: 4px solid var(--color-accent);
-  margin-top: -50px;
+.cover-image {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  background: var(--color-accent);
+  transition: transform 0.5s ease;
 }
 
-.info-section {
+.cover-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.6) 100%);
+}
+
+/* ====================================
+  IDENTITY OVERLAY
+   ==================================== */
+.identity-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0 2rem 2.5rem;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-top: 0.75rem;
-  gap: 1rem;
-  padding-bottom: 1rem;
+  align-items: flex-end;
+  gap: 2rem;
+  z-index: 5;
 }
 
-.user-info {
-  flex-grow: 1;
+.avatar-box {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  position: relative;
+  transform: translateY(2rem);
 }
 
-.user-name {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--color-text);
-  margin: 0 0 2px 0;
+.avatar-ring {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  overflow: hidden;
+  padding: 6px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-xl);
+  position: relative;
 }
 
-.user-role {
-  color: var(--color-gray);
-  font-size: 13px;
+.profile-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
-.actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+.status-indicator {
+  position: absolute;
+  z-index: 12 !important;
+  bottom: 12px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  background: #10b981;
+  border: 4px solid var(--color-surface);
+  border-radius: 50%;
 }
 
-.btn {
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 13px;
+.identity-details {
+  flex: 1;
+  padding-bottom: 0.5rem;
+}
+
+.display-name {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 0.25rem;
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.role-text {
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 1rem;
   font-weight: 500;
+}
+
+.identity-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 1rem;
+  padding-bottom: 0.75rem;
 }
 
-.btn-outline {
-  padding: 8px 14px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  color: var(--color-text);
-  background: var(--color-accent);
-}
-
-.btn-outline:hover {
-  background: var(--color-primary);
-  border-color: var(--border-color-hover);
-  color: white;
-}
-
-.btn-icon {
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  color: var(--color-primary);
-  background: var(--color-accent);
-}
-
-.btn-icon:hover {
-  background: var(--color-primary);
-  border-color: var(--border-color-hover);
-  color: white;
-}
-
-.btn svg {
-  flex-shrink: 0;
-}
-
-.profile-tabs {
+.chat-btn {
+  padding: 0.875rem 2rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
   display: flex;
+  align-items: center;
   gap: 0.5rem;
-  border-top: 1px solid var(--border-color);
-  padding-top: 0;
+  font-weight: 700 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
 }
 
-.tab-btn {
-  padding: 0.75rem 1rem;
+.settings-trigger {
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.settings-trigger:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ====================================
+   NAVIGATION
+   ==================================== */
+.header-nav {
+  padding: 0 2rem;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  margin-left: 220px;
+  /* Offset for avatar */
+}
+
+.nav-link-btn {
+  padding: 1.5rem 0.5rem;
+  background: none;
   border: none;
-  background: transparent;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--color-gray);
-  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--color-muted);
   position: relative;
-  transition: color 0.2s;
+  transition: color 0.3s ease;
 }
 
-.tab-btn:hover {
+.nav-link-btn:hover {
   color: var(--color-text);
 }
 
-.tab-btn.active {
-  color: var(--color-text);
+.nav-link-btn.active {
+  color: var(--color-primary);
 }
 
-.tab-btn.active::after {
+.nav-link-btn.active::after {
   content: '';
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 2px;
-  background: var(--color-text);
+  height: 4px;
+  background: var(--color-primary);
+  border-radius: 4px 4px 0 0;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .cover {
-    height: 200px;
+/* ====================================
+   RESPONSIVE
+   ==================================== */
+@media (max-width: 991px) {
+  .cover-area {
+    height: 280px;
   }
 
-  .avatar {
-    width: 80px;
-    height: 80px;
-    margin-top: -40px;
-  }
-
-  .info-section {
+  .identity-container {
     flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding-bottom: 1.5rem;
   }
 
-  .actions {
-    width: 100%;
+  .avatar-box {
+    transform: translateY(0);
   }
 
-  .profile-tabs {
-    overflow-x: auto;
+  .avatar-ring {
+    width: 140px;
+    height: 140px;
   }
 
-  .tab-btn {
-    white-space: nowrap;
+  .nav-links {
+    margin-left: 0;
+    justify-content: center;
+    gap: 1rem;
   }
 }
 </style>
