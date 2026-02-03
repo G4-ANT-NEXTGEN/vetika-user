@@ -114,9 +114,9 @@ onMounted(async () => {
 <style scoped>
 .professional-card {
   padding: 16px;
-  background: #f9fafb;
+  background: var(--color-surface);
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
 }
 
 .info-row {
@@ -138,7 +138,7 @@ onMounted(async () => {
 
 .icon {
   font-size: 1rem;
-  color: #1f2937;
+  color: var(--color-text);
   width: 20px;
   text-align: center;
   flex-shrink: 0;
@@ -147,14 +147,14 @@ onMounted(async () => {
 .job-title {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--color-text);
   margin: 0;
 }
 
 .company-text {
   font-size: 0.9rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--color-text-secondary);
 }
 
 .responsibility-row {
@@ -170,7 +170,7 @@ onMounted(async () => {
 
 .responsibility-text {
   font-size: 0.875rem;
-  color: #4b5563;
+  color: var(--color-text-tertiary);
   margin: 0;
   line-height: 1.6;
 }
@@ -178,7 +178,7 @@ onMounted(async () => {
 .no-data {
   padding: 16px;
   text-align: center;
-  color: #6b7280;
+  color: var(--color-muted);
 }
 
 .no-data p {

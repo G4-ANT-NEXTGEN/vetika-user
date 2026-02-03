@@ -7,7 +7,12 @@
     </label>
 
     <!-- Select -->
-    <select class="form-select select-input" :value="modelValue" :disabled="disabled" @change="onChange">
+    <select
+      class="form-select select-input"
+      :value="modelValue"
+      :disabled="disabled"
+      @change="onChange"
+    >
       <option v-if="placeholder" disabled value="">
         {{ placeholder }}
       </option>
@@ -56,40 +61,46 @@ const onChange = (e) => {
 .select-label {
   font-size: 14px;
   font-weight: 500;
-  color: var(--color-dark);
+  color: var(--color-text);
 }
 
 .required {
-  color: #dc2626;
+  color: var(--color-danger);
   margin-left: 2px;
 }
 
 /* select input */
 .select-input {
-  background: #f8fafc;
-  border: 1px solid #e5e7eb;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   min-height: 44px;
   padding: 8px 12px;
   font-size: 14px;
-  color: var(--color-dark);
+  color: var(--color-text);
 }
 
 /* focus */
 .select-input:focus {
-  border-color: var(--color-dark);
-  box-shadow: 0 0 0 2px rgba(31, 41, 55, 0.08);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.06);
+  outline: none;
+}
+
+[data-theme='dark'] .select-input:focus {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.04);
 }
 
 /* disabled */
 .select-input:disabled {
-  background: #f1f5f9;
+  background: var(--bg-dropdown-hover);
   cursor: not-allowed;
+  opacity: 0.9;
 }
 
 /* error */
 .error-text {
   font-size: 13px;
-  color: #dc2626;
+  color: var(--color-danger);
 }
 </style>

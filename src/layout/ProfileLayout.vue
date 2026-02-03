@@ -1,11 +1,10 @@
 <template>
   <div class="profile-page p-3">
     <AppNavbar @toggle-menu="toggleMobileMenu" />
-    <!-- <NavigationMenu :isOpen="isMobileMenuOpen" @close="isMobileMenuOpen = false" /> -->
 
     <ProfileHeader :activeTab="activeTab" @change-tab="activeTab = $event" />
 
-    <div class="profile-container">
+    <div class="profile-container p-0">
       <div class="profile-layout">
         <!-- Sidebar -->
         <aside class="profile-sidebar">
@@ -14,9 +13,6 @@
 
         <!-- Main content -->
         <main class="profile-content">
-          <div class="mb-3">
-            <h5>Post Card</h5>
-          </div>
           <component :is="currentComponent" />
         </main>
       </div>
@@ -28,7 +24,6 @@
 import { ref, computed } from 'vue'
 
 import AppNavbar from '@/components/layout/AppNavbar.vue'
-// import NavigationMenu from '@/components/layout/NavigationMenu.vue'
 import ProfileHeader from '@/components/profile/ProfileHeader.vue'
 import ProfileSidebar from '@/components/profile/ProfileSidebar.vue'
 
@@ -37,7 +32,6 @@ import ProfessionalInfo from '@/components/profile/sidebar/ProfessionalInfo.vue'
 import ProjectsInfo from '@/components/profile/sidebar/ProjectsInfo.vue'
 import EducationInfo from '@/components/profile/sidebar/EducationInfo.vue'
 import CVInfo from '@/components/profile/sidebar/CVInfo.vue'
-// import AppNavbar from '@/components/layout/AppNavbar.vue'
 
 
 const activeTab = ref('overview')
@@ -62,7 +56,7 @@ const currentComponent = computed(() => map[activeTab.value])
 .profile-page {
   background: var(--color-background);
   min-height: 100vh;
-  margin-top: 77px;
+  margin-top: 66px;
 }
 
 .profile-container {

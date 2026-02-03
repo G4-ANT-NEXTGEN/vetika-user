@@ -17,9 +17,6 @@
 
         <!-- Main content -->
         <main class="profile-content">
-          <div class="mb-3">
-            <h5>Post Card</h5>
-          </div>
           <component :is="currentComponent" />
         </main>
       </div>
@@ -64,7 +61,7 @@ const currentComponent = computed(() => map[activeTab.value])
 .profile-page {
   background: var(--color-background);
   min-height: 100vh;
-  margin-top: 77px;
+  margin-top: 66px !important;
 }
 
 .profile-container {

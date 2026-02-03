@@ -1,55 +1,49 @@
 <template>
-  <div class="profile-header-wrapper">
-    <!-- Cover - Read Only -->
-    <div class="cover position-relative">
-      <!-- No edit button for read-only view -->
-    </div>
+  <ProfileHeaderSkeleton v-if="!userData" />
+  <div class="profile-header-wrapper" v-else>
 
-    <!-- Profile Content -->
-    <div class="container-fluid p-0">
-      <div class="profile-content px-3">
-        <!-- Avatar - Read Only -->
-        <div class="avatar-wrapper">
-          <img class="avatar" :src="userData?.avatar || ''" alt="Profile" />
-          <!-- No edit button for read-only view -->
-        </div>
-
-        <!-- Info - Display Only -->
-        <div class="info-section">
-          <div class="user-info">
-            <h4 class="user-name">{{ userData?.full_name || 'User Name' }}</h4>
-            <small class="user-role"
-              >{{ userData?.professional?.job_title || 'Position' }} •
-              {{ userData?.professional?.company_name || 'Company' }}</small
-            >
-          </div>
-
-          <!-- No action buttons for read-only view -->
-          <div class="actions" style="display: none"></div>
-        </div>
+    <!-- ── Cover ── -->
+    <div class="cover-section">
+      <div class="cover-image-container">
+        <img :src="userData?.cover" alt="Profile Cover" class="cover-img" />
+        <div class="cover-overlay"></div>
       </div>
 
-      <!-- Tabs -->
-      <div class="profile-tabs">
-        <button
-          v-for="tab in tabs"
-          :key="tab.key"
-          :class="['tab-btn', { active: activeTab === tab.key }]"
-          @click="$emit('change-tab', tab.key)"
-        >
-          {{ tab.label }}
-        </button>
+      <!-- Avatar sits on top of cover -->
+      <div class="avatar-container">
+        <img class="avatar-image" :src="userData?.avatar || ''" alt="Profile" />
       </div>
     </div>
+
+    <!-- ── Name + Role ── -->
+    <div class="profile-info-section">
+      <div class="profile-info">
+        <h1 class="user-name">{{ userData?.full_name || 'User Name' }}</h1>
+        <p class="user-role">
+          {{ userData?.professional?.job_title || 'Position' }} •
+          {{ userData?.professional?.company_name || 'Company' }}
+        </p>
+      </div>
+      <!-- no action buttons -->
+    </div>
+
+    <!-- ── Tabs ── -->
+    <div class="profile-nav-tabs">
+      <button
+        v-for="tab in tabs"
+        :key="tab.key"
+        :class="['nav-tab', { active: activeTab === tab.key }]"
+        @click="$emit('change-tab', tab.key)"
+      >
+        {{ tab.label }}
+      </button>
+    </div>
+
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useProfileStore } from '@/stores/profile'
-
-const profileStore = useProfileStore()
-
+import ProfileHeaderSkeleton from './ProfileHeaderSkeleton.vue';
 defineProps({
   activeTab: {
     type: String,
@@ -64,191 +58,189 @@ defineProps({
 defineEmits(['change-tab'])
 
 const tabs = [
-  { key: 'overview', label: 'Overview' },
+  { key: 'overview',      label: 'Overview' },
   { key: 'professional', label: 'Professional' },
-  { key: 'education', label: 'Education' },
-  { key: 'project', label: 'Project' },
-  { key: 'cv', label: 'CV' },
+  { key: 'education',    label: 'Education' },
+  { key: 'project',      label: 'Project' },
+  { key: 'cv',           label: 'CV' },
 ]
 </script>
 
 <style scoped>
+/* ====================================
+   MAIN WRAPPER
+   ==================================== */
 .profile-header-wrapper {
-  background: var(--color-accent);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  margin-bottom: 0;
-  border-radius: 10px;
+  background: var(--color-surface);
+  border-radius: 16px;
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 24px;
 }
 
-.cover {
-  height: 400px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  background-image: url('../../assets/R.png');
-  background-size: cover;
-  background-position: center;
+/* ====================================
+   COVER SECTION
+   ==================================== */
+.cover-section {
   position: relative;
+  height: 240px;
+  background: var(--color-accent);
 }
 
-.profile-content {
+.cover-image-container {
   position: relative;
+  width: 100%;
+  height: 100%;
 }
 
-.avatar-wrapper {
-  position: relative;
-  width: fit-content;
-  padding-top: 1rem;
+.cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
-.avatar {
-  width: 100px;
-  height: 100px;
+.cover-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.3) 100%);
+  pointer-events: none;
+}
+
+/* ====================================
+   AVATAR
+   ==================================== */
+.avatar-container {
+  position: absolute;
+  bottom: -50px;
+  left: 32px;
+}
+
+.avatar-image {
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  border: 4px solid var(--color-accent);
-  margin-top: -50px;
+  border: 4px solid var(--color-surface);
   object-fit: cover;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   background: var(--color-accent);
+  display: block;
 }
 
-.info-section {
+/* ====================================
+   PROFILE INFO
+   ==================================== */
+.profile-info-section {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-top: 0.75rem;
-  gap: 1rem;
-  padding-bottom: 1rem;
+  align-items: center;
+  padding: 64px 32px 24px;
+  gap: 20px;
 }
 
-.user-info {
-  flex-grow: 1;
+.profile-info {
+  flex: 1;
 }
 
 .user-name {
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 24px;
+  font-weight: 700;
   color: var(--color-text);
-  margin: 0 0 2px 0;
+  margin: 0 0 4px 0;
+  letter-spacing: -0.5px;
 }
 
 .user-role {
-  color: var(--color-gray);
-  font-size: 13px;
+  font-size: 15px;
+  color: var(--color-muted);
+  margin: 0;
+  font-weight: 500;
 }
 
-.actions {
+/* ====================================
+   NAVIGATION TABS
+   ==================================== */
+.profile-nav-tabs {
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  gap: 0;
+  padding: 0 32px;
+  border-top: 1px solid var(--color-border);
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
-.btn {
+.profile-nav-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.nav-tab {
+  padding: 16px 24px;
   border: none;
   background: transparent;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 13px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.btn-outline {
-  padding: 8px 14px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  color: var(--color-text);
-  background: var(--color-accent);
-}
-
-.btn-outline:hover {
-  background: var(--color-primary);
-  border-color: var(--border-color-hover);
-  color: white;
-}
-
-.btn-icon {
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  color: var(--color-primary);
-  background: var(--color-accent);
-}
-
-.btn-icon:hover {
-  background: var(--color-primary);
-  border-color: var(--border-color-hover);
-  color: white;
-}
-
-.btn svg {
-  flex-shrink: 0;
-}
-
-.profile-tabs {
-  display: flex;
-  gap: 0.5rem;
-  border-top: 1px solid var(--border-color);
-  padding-top: 0;
-}
-
-.tab-btn {
-  padding: 0.75rem 1rem;
-  border: none;
-  background: transparent;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--color-gray);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-muted);
   cursor: pointer;
   position: relative;
-  transition: color 0.2s;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
-.tab-btn:hover {
+.nav-tab:hover {
   color: var(--color-text);
 }
 
-.tab-btn.active {
+.nav-tab.active {
   color: var(--color-text);
 }
 
-.tab-btn.active::after {
+.nav-tab.active::after {
   content: '';
   position: absolute;
-  bottom: 0;
+  bottom: -1px;
   left: 0;
   right: 0;
   height: 2px;
   background: var(--color-text);
 }
 
-/* Responsive adjustments */
+/* ====================================
+   RESPONSIVE
+   ==================================== */
 @media (max-width: 768px) {
-  .cover {
+  .cover-section {
     height: 200px;
   }
 
-  .avatar {
-    width: 80px;
-    height: 80px;
-    margin-top: -40px;
+  .avatar-container {
+    left: 20px;
+    bottom: -40px;
   }
 
-  .info-section {
-    flex-direction: column;
+  .avatar-image {
+    width: 100px;
+    height: 100px;
   }
 
-  .actions {
-    width: 100%;
+  .profile-info-section {
+    padding: 52px 20px 20px;
   }
 
-  .profile-tabs {
-    overflow-x: auto;
+  .user-name {
+    font-size: 20px;
   }
 
-  .tab-btn {
-    white-space: nowrap;
+  .user-role {
+    font-size: 14px;
+  }
+
+  .profile-nav-tabs {
+    padding: 0 20px;
+  }
+
+  .nav-tab {
+    padding: 14px 16px;
+    font-size: 14px;
   }
 }
 </style>

@@ -148,7 +148,7 @@
       </div>
 
       <div class="mb-2">
-        <label class="mb-2 fw-semibold">Description</label>
+        <label class="mb-2 fw-semibold form-label">Description</label>
         <textarea
           class="form-control"
           placeholder="Description"
@@ -226,7 +226,7 @@ const start_date = ref('')
 const end_date = ref('')
 const description = ref('')
 
-const onCreate = () => {
+const onCreate = () => {  
   resetForm()
   isEditMode.value = false
   addNewEducation.value = true
@@ -350,6 +350,14 @@ onMounted(async () => {
   font-size: 1rem;
   color: var(--color-text-muted, #64748b);
   flex-shrink: 0;
+}
+
+.form-label{
+  color: var(--color-text);
+}
+
+.form-control{
+  background: var(--color-surface)
 }
 
 .text-medium {
