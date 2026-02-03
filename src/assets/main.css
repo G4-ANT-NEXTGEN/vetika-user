@@ -41,6 +41,16 @@ body {
   --color-danger: #dc3545;
   --color-on-primary: #000;
 
+  /* Button Colors */
+  --btn-primary-bg: #18181b;
+  /* Sophisticated Zinc-900 */
+  --btn-primary-text: #ffffff;
+  --btn-primary-hover: #27272a;
+  --btn-secondary-bg: #ffffff;
+  --btn-secondary-text: #18181b;
+  --btn-secondary-border: #e4e4e7;
+  --btn-secondary-hover: #f4f4f5;
+
   /* Misc & Interactions */
   --bg-hover: #f0f0f0;
   --bg-tag: #e5e7eb;
@@ -103,6 +113,16 @@ body {
   --color-accent: #252525;
   --color-danger: #ef4444;
   --color-on-primary: #ffffff;
+
+  /* Button Colors */
+  --btn-primary-bg: #fafafa;
+  /* Clean Zinc-50 */
+  --btn-primary-text: #18181b;
+  --btn-primary-hover: #f4f4f5;
+  --btn-secondary-bg: #18181b;
+  --btn-secondary-text: #fafafa;
+  --btn-secondary-border: #27272a;
+  --btn-secondary-hover: #27272a;
 
   /* Misc & Interactions */
   --bg-hover: #2a2a2a;

@@ -78,13 +78,11 @@
         <h3 class="fw-bold mb-3">Still have questions?</h3>
         <p class="mb-4 opacity-75">Can't find the answer you're looking for? Please seek further assistance.</p>
         <div class="d-flex gap-3 justify-content-center flex-wrap">
-          <button @click="$router.push({ name: 'contact' })" type="button"
-            class="btn btn-primary px-4 py-2 rounded-pill shadow-sm">
+
+          <BaseButton type="button" variant="primary" @click="$router.push({ name: 'contact' })">
             <i class="bi bi-chat-dots-fill me-2"></i>Contact Support
-          </button>
-          <button class="btn btn-outline-secondary px-4 py-2 rounded-pill bg-white text-dark border-0 shadow-sm">
-            <i class="bi bi-envelope-fill me-2"></i>Email Us
-          </button>
+          </BaseButton>
+
         </div>
       </div>
     </div>
@@ -92,6 +90,7 @@
 </template>
 
 <script setup>
+import BaseButton from '@/components/ui/base/BaseButton.vue';
 import BaseInput from '@/components/ui/base/BaseInput.vue';
 import { ref, computed } from 'vue';
 

@@ -68,24 +68,25 @@ const handleClick = () => {
 }
 
 .btn-primary {
-  background: var(--color-primary);
-  color: var(--color-secondary);
-  border: 1px solid var(--color-primary);
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  border: 1px solid var(--btn-primary-bg);
 }
 
 .btn-primary:hover {
-  opacity: 0.9;
+  background: var(--btn-primary-hover);
+  border-color: var(--btn-primary-hover);
   box-shadow: var(--shadow-md);
 }
 
 .btn-secondary {
-  background: var(--color-secondary);
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
+  background: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
+  border: 1px solid var(--btn-secondary-border);
 }
 
 .btn-secondary:hover {
-  background: var(--color-border);
+  background: var(--btn-secondary-hover);
 }
 
 .main-btn:disabled {

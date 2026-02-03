@@ -74,7 +74,7 @@
           <textarea v-model="titlePost" class="title-post form-control" :class="{ 'is-invalid': errorTitle }" rows="4"
             placeholder="What's on your mind?" @input="validateTitle"></textarea>
           <div v-if="errorTitle" class="invalid-feedback d-block">{{ errorTitle }}</div>
-          <small v-if="titlePost" class="text-muted d-block mt-2">{{ titlePost.length }}/500
+          <small v-if="titlePost" class="text-color d-block mt-2">{{ titlePost.length }}/500
             characters</small>
         </div>
         <div class="category-selection">
@@ -369,6 +369,10 @@ defineOptions({
   gap: 10px;
   margin: 20px 0;
   flex-wrap: wrap;
+}
+
+.text-color{
+  color: var(--color-text);
 }
 
 .category {
