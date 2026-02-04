@@ -178,8 +178,8 @@ export const useProfileStore = defineStore("profile", () => {
   };
 
   const changePassword = async (payload) => {
-    isProcessing.value = true;
     try {
+      isProcessing.value = true;
       const params = new URLSearchParams();
       params.append("old_pass", payload.old_pass);
       params.append("new_pass", payload.new_pass);
@@ -190,7 +190,16 @@ export const useProfileStore = defineStore("profile", () => {
           "Content-Type": "application/x-www-form-urlencoded",
         },
       });
+
+      if(!res.data.result){
+        showError(res.data.message)
+
+        isProcessing.value=true
+        return
+      }
+      showSuccess(res.data.message)
       await fetchProfile();
+      // showSuccess('Password has been change')
       return res.data;
     } catch (error) {
       console.error("Failed to change password:", error);
@@ -233,9 +242,20 @@ export const useProfileStore = defineStore("profile", () => {
       isLoading.value = false;
     }
   }
-
-  
-
+  const deleteAccount =async()=>{
+    try{
+      isLoading.value=true
+      await api.delete(`/api/profile/delete-acc`)
+      showSuccess('Delete Account Successful')
+    }
+    catch(e){
+      console.log(e)
+      showError('Fail to delete account!')
+    }
+    finally{
+      isLoading.value=false
+    }
+  }
   return {
     user,
     viewUser,
@@ -253,6 +273,7 @@ export const useProfileStore = defineStore("profile", () => {
     removeCover,
     uploadCv,
     userProfile,
-    addCollaboration
+    addCollaboration,
+    deleteAccount
   };
 });
