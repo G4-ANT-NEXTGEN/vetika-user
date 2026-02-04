@@ -1,10 +1,5 @@
 <template>
-  <ViewProfileUserLayout v-if="!isLoading" :userData="userProfile" />
-  <div v-else class="d-flex justify-content-center align-items-center" style="height: 100vh">
-    <div class="spinner-border" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
-  </div>
+  <ViewProfileUserLayout :userData="userProfile" />
 </template>
 
 <script setup>

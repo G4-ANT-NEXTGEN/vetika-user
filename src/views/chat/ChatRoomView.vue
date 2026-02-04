@@ -1,65 +1,58 @@
 <template>
-  <div class="chat-section container-fluid">
-    <div class="row">
-      <div v-if="isLoading" class="p-4">
-        <div class="d-flex align-items-center py-3">
-          <div class="skeleton skeleton-circle me-3" style="width:50px;height:50px;"></div>
-          <div class="skeleton skeleton-text" style="width:120px;"></div>
+  <div class="chat-room-facelift h-100 d-flex flex-column">
+    <!-- Header -->
+    <div class="room-header px-4 py-3 border-bottom">
+      <router-link :to="{ name: 'view-profile', params: { id: route.params.id } }"
+        class="text-decoration-none d-flex align-items-center">
+        <div class="avatar-stack me-3">
+          <img
+            :src="conversationMessage[0]?.isMine ? conversationMessage[0]?.receiver.avatar : conversationMessage[0]?.sender.avatar"
+            class="header-avatar" />
         </div>
-        <div v-for="i in 8" :key="i" class="d-flex mb-3"
-          :class="i % 2 ? 'justify-content-end' : 'justify-content-start'">
-          <div class="skeleton" :style="{
-            width: i % 2 ? '200px' : '220px',
-            height: '40px'
-          }"></div>
+        <div class="user-details">
+          <h4 class="m-0">{{ conversationMessage[0]?.isMine ? conversationMessage[0]?.receiver.full_name :
+            conversationMessage[0]?.sender.full_name }}</h4>
+          <span class="status-text">Online</span>
         </div>
-        <div class="py-3 d-flex align-items-center">
-          <div class="skeleton flex-grow-1" style="height:45px;"></div>
-          <div class="skeleton ms-2" style="width:45px;height:45px;"></div>
-        </div>
+      </router-link>
+    </div>
+
+    <!-- Message Stream -->
+    <div v-if="isLoading" class="p-4 flex-grow-1">
+      <div v-for="i in 5" :key="i" class="skeleton-bubble-container mb-4" :class="{ 'sent': i % 2 === 0 }">
+        <div class="skeleton-avatar"></div>
+        <div class="skeleton-bubble"></div>
       </div>
+    </div>
 
-      <div v-else-if="chatStore.isSelectChat" class="main-content">
-        <div class="receiver-name">
-          <router-link :to="{ name: 'profile' }" class="text-decoration-none" style="color:var(--color-text)">
-            <div class="d-flex align-items-center h-100 px-3">
-              <img class="rounded-5 me-2"
-                :src="conversationMessage[0]?.isMine ? conversationMessage[0]?.receiver.avatar : conversationMessage[0]?.sender.avatar"
-                alt="" width="60" height="60">
-              <h4 class="m-0" style="color:var(--color-dark)">{{ conversationMessage[0]?.isMine ?
-                conversationMessage[0]?.receiver.full_name :
-                conversationMessage[0]?.sender.full_name }}</h4>
-            </div>
-          </router-link>
-        </div>
-        <div class="px-3 pt-5">
-          <div v-for="receive in conversationMessage" :key="receive.id">
-            <div v-if="!receive.isMine">
+    <div v-else class="message-stream flex-grow-1 p-4 overflow-y-auto">
+      <div class="date-divider"><span>Today</span></div>
 
-              <img class="bg-danger rounded-5 me-2"
-                :src="conversationMessage[0]?.isMine ? conversationMessage[0]?.receiver.avatar : conversationMessage[0]?.sender.avatar"
-                alt="" width="30" height="30">
-              <p class="receive-message mb-2">{{ receive.message }} <br> <span  style="font-size: 11px;">{{
-                formatLocalTime(receive.created_at) }}</span></p>
-            </div>
-            <div class="text-end" v-else>
-              <p class="send-message mb-2">{{ receive.message }} <br> <span class="" style="font-size: 11px; color: gray;">{{
-                formatLocalTime(receive.created_at) }}</span></p>
-            </div>
+      <div v-for="msg in conversationMessage" :key="msg.id" class="message-group" :class="{ 'is-mine': msg.isMine }">
+        <img v-if="!msg.isMine" :src="msg.sender.avatar" class="bubble-avatar" />
+        <div class="bubble-wrapper">
+          <div class="message-bubble">
+            <p>{{ msg.message }}</p>
           </div>
-          <div class="input-message d-flex">
-
-            <base-input class="w-100" v-model="message" placeholder="send message..."></base-input>
-            <base-button class="btn-send-message" @click="sendMessage"><span style="font-size: 14px;"
-                v-if="chatStore.isLoading"> Sending...</span><span v-else><i
-                  class="bi bi-send"></i></span></base-button>
-          </div>
+          <span class="msg-time">{{ formatLocalTime(msg.created_at) }}</span>
         </div>
+        <img v-if="msg.isMine" :src="msg.sender.avatar" class="bubble-avatar" />
       </div>
+    </div>
 
+    <!-- Facelift Input -->
+    <div class="room-input-area p-3">
+      <div class="input-card">
+        <div class="input-field">
+          <input type="text" v-model="message" placeholder="Type a message..." @keyup.enter="sendMessage" />
+        </div>
+        <button class="send-facelift-btn" @click="sendMessage" :disabled="!message.trim() || chatStore.isLoading">
+          <i v-if="!chatStore.isLoading" class="bi bi-send-fill"></i>
+          <span v-else class="spinner-border spinner-border-sm"></span>
+        </button>
+      </div>
     </div>
   </div>
-
 </template>
 <script setup>
 
@@ -114,106 +107,257 @@ onMounted(async () => {
 })
 </script>
 <style scoped>
-.main-content {
+.chat-room-facelift {
   background: var(--color-background);
-  border-radius: 10px;
-  height: calc(100vh - 108px);
-  padding-bottom: 36px;
-  overflow-y: scroll;
 }
 
-.chat-section {
-  background: var(--color-backgrond);
-  height: 100vh;
-  padding: 16px 0;
-}
-
-.receiver-name {
-  position: sticky;
-  background: var(--sidebar-bg);
-  border-radius: 16px 16px 0px 0px;
-  height: 80px;
-  margin-top: -36px;
-  top: 0;
-  color:var(--color-text)
-
-}
-
-.input-message {
-  position: fixed;
-  align-self: center;
-  padding-top: 16px;
-  padding-inline: 16px;
-  border-radius: 0px 0px 16px 16px;
-  bottom: 16px;
-  width: 73.8%;
-  margin-left: -16px;
-  background: var(--sidebar-bg);
-}
-
-.receive-message {
-  max-width: 60%;
-  height: auto;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+.room-header {
   background: var(--color-surface);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+
+.header-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.status-indicator {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--color-surface);
+}
+
+.status-indicator.online {
+  background: #10b981;
+}
+
+.user-details h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
   color: var(--color-text);
-  padding: 8px 12px;
-  border-radius: 10px;
-  display: inline-block;
-  margin-bottom: 5px;
 }
 
-.send-message {
-  max-width: 60%;
-  height: auto;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  background: var(--color-text);
-  color: var(--color-surface);
-  padding: 8px 12px;
-  border-radius: 10px;
-  display: inline-block;
-  margin-bottom: 5px;
+.status-text {
+  font-size: 0.75rem;
+  color: #10b981;
 }
 
-.btn-send-message {
-  margin-left: 8px;
-  font-size: 24px;
-  width: 8%;
-  height: 60px;
-  padding: 10px;
+.action-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--color-muted);
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
 }
 
-.skeleton {
-  background: linear-gradient(90deg,
-      #e0e0e0 25%,
-      #f5f5f5 37%,
-      #e0e0e0 63%);
-  background-size: 400% 100%;
-  animation: shimmer 1.4s ease infinite;
-  border-radius: 8px;
+.action-btn:hover {
+  background: var(--color-hover);
+  color: var(--color-primary);
 }
 
-@keyframes shimmer {
+.message-stream {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.date-divider {
+  text-align: center;
+  position: relative;
+  margin: 20px 0;
+}
+
+.date-divider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--color-border);
+  z-index: 1;
+}
+
+.date-divider span {
+  position: relative;
+  background: var(--color-background);
+  padding: 0 16px;
+  font-size: 0.75rem;
+  color: var(--color-muted);
+  z-index: 2;
+}
+
+.message-group {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  max-width: 80%;
+}
+
+.message-group.is-mine {
+  align-self: flex-end;
+  flex-direction: row;
+}
+
+.bubble-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.message-bubble {
+  padding: 12px 18px;
+  border-radius: 20px 20px 20px 4px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+
+.is-mine .message-bubble {
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  border-radius: 20px 20px 4px 20px;
+}
+
+.message-bubble p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.msg-time {
+  font-size: 0.65rem;
+  opacity: 0.6;
+  display: block;
+  margin-top: 5px;
+  text-align: right;
+}
+
+.room-input-area {
+  background: var(--color-background);
+}
+
+.input-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  box-shadow: var(--shadow-md);
+}
+
+.util-btn,
+.emoji-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.3rem;
+  color: var(--color-muted);
+  padding: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.input-field {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+}
+
+.input-field input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 8px 0;
+  color: var(--color-text);
+}
+
+.input-field input:focus {
+  outline: none;
+}
+
+.send-facelift-btn {
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.send-facelift-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.send-facelift-btn:disabled {
+  opacity: 0.5;
+}
+
+/* Skeleton facelifts */
+.skeleton-bubble-container {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.skeleton-bubble-container.sent {
+  flex-direction: row-reverse;
+}
+
+.skeleton-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-border);
+  animation: pulse 1.5s infinite;
+}
+
+.skeleton-bubble {
+  height: 40px;
+  width: 200px;
+  border-radius: 15px;
+  background: var(--color-border);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
   0% {
-    background-position: 100% 0;
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 0.3;
   }
 
   100% {
-    background-position: -100% 0;
+    opacity: 0.6;
   }
 }
 
-.skeleton-circle {
-  border-radius: 50%;
+.message-stream::-webkit-scrollbar {
+  width: 4px;
 }
 
-.skeleton-text {
-  height: 14px;
-}
-
-.skeleton-small {
-  height: 10px;
+.message-stream::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 10px;
 }
 </style>

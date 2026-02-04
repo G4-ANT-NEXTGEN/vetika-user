@@ -1,80 +1,74 @@
 <template>
-  <div class="chat-section container-fluid">
-    <div class="row">
-      <div class="">
-        <div v-if="isLoading">
-          <div class="p-3">
-            <div class="skeleton skeleton-text mb-3" style="width:120px;height:22px;"></div>
-            <div class="skeleton mb-4" style="height:45px;border-radius:12px;"></div>
-            <div v-for="i in 4" :key="i" class="d-flex align-items-center mb-3 p-2">
-              <div class="skeleton skeleton-circle me-3" style="width:48px;height:48px;"></div>
-              <div class="flex-grow-1">
-                <div class="skeleton skeleton-text mb-2" style="width:60%;"></div>
-                <div class="skeleton skeleton-small" style="width:40%;"></div>
-              </div>
-            </div>
-          </div>
-          <div class="d-flex align-items-center p-3" v-for="i in 4" :key="i">
-            <div class="skeleton skeleton-circle me-3" style="width:50px;height:50px;"></div>
-            <div class="flex-grow-1">
-              <div class="skeleton skeleton-text mb-2" style="width:60%;"></div>
-              <div class="skeleton skeleton-small" style="width:40%;"></div>
-            </div>
-          </div>
-        </div>
-        <div v-else class="chat-list">
-          <div class="search-chat p-3 pb-1">
-            <div class="d-flex justify-content-between align-items-center">
-              <h4 style="color:var(--color-text)">Messages</h4>
-              <button @click="toggleTheme" class="theme-btn">
-                <i v-if="theme === 'light'" class="bi bi-moon-fill icon-btn"></i>
-                <i v-else class="bi bi-brightness-high-fill icon-btn"></i>
-              </button>
-            </div>
-            <base-input class="w-100 pt-3" placeholder="Search Conversation..."></base-input>
-          </div>
-          <hr class="my-1" />
-          <div class="chat" v-for="chat in chatStore.chatList" :key="chat.id">
-            <router-link class="text-start conversationer text-decoration-none" @click="isSelectChat(true)"
-              :to="{ name: 'chat-room', params: { id: chat.messages[0].isMine ? chat.messages[0].receiver.id : chat.messages[0].sender.id } }"
-              type="button" variant="white">
-              <div class="d-flex align-items-center">
-                <img :src="chat.messages[0].isMine ? chat.messages[0].receiver.avatar : chat.messages[0].sender.avatar"
-                  class="rounded-5 me-2" width="60" height="60" alt="">
-                <div>
-                  <p class="mb-0 fw-bold" style="color:var(--color-dark)">{{ chat.messages[0].isMine ?
-                    chat.messages[0].receiver.full_name :
-                    chat.messages[0].sender.full_name }}
-                  </p>
-                  <div class="message">
-                    <span v-if="chat.messages[0].isMine" style="color:var(--color-text);">{{ `You :
-                      ${chat.messages[0].message}` }}</span>
-                    <span v-else style="font-weight: bold;color: var(--color-text); font-size: 15px;">{{
-                      `${chat.messages[0].sender.full_name} : ${chat.messages[0].message}` }}</span>
-                  </div>
-                </div>
-              </div>
-            </router-link>
-          </div>
+  <div class="chat-list-container">
+    <div class="list-header">
+      <div class="header-top px-3 pt-3 pb-2">
+        <h2 class="ms-3">Messages</h2>
+        <div class="badge-count">{{ chatStore.chatList.length }}</div>
+      </div>
+      <div class="search-box-wrapper px-3 pb-3">
+        <div class="custom-search">
+          <i class="bi bi-search"></i>
+          <input type="text" placeholder="Search conversations..." />
         </div>
       </div>
     </div>
-  </div>
 
+    <div class="scrollable-area">
+      <div v-if="isLoading" class="skeleton-list p-3">
+        <div v-for="i in 6" :key="i" class="skeleton-item mb-4">
+          <div class="skeleton-circle"></div>
+          <div class="skeleton-texts">
+            <div class="skeleton-line w-75"></div>
+            <div class="skeleton-line w-50 mt-2"></div>
+          </div>
+        </div>
+      </div>
+
+      <div v-else class="chats-stack">
+        <router-link v-for="chat in chatStore.chatList" :key="chat.id" class="chat-entry"
+          :to="{ name: 'chat-room', params: { id: chat.messages[0].isMine ? chat.messages[0].receiver.id : chat.messages[0].sender.id } }"
+          active-class="active" @click="chatStore.isSelectChat = true">
+          <div class="avatar-cell">
+            <img :src="chat.messages[0].isMine ? chat.messages[0].receiver.avatar : chat.messages[0].sender.avatar"
+              class="user-avatar" />
+            <span class="status-dot online"></span>
+            <div v-if="chat.unreadCount > 0" class="unread-pill">{{ chat.unreadCount }}</div>
+          </div>
+          <div class="info-cell">
+            <div class="name-row">
+              <span class="full-name">{{ chat.messages[0].isMine ? chat.messages[0].receiver.full_name :
+                chat.messages[0].sender.full_name }}</span>
+              <span class="time-stamp">{{ formatLocalTime(chat.messages[0].created_at) }}</span>
+            </div>
+            <div class="message-row">
+              <p class="last-msg-text text-truncate">
+                <span v-if="chat.messages[0].isMine">You: </span>
+                {{ chat.messages[0].message }}
+              </p>
+            </div>
+          </div>
+        </router-link>
+      </div>
+    </div>
+  </div>
 </template>
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useChatStore } from '@/stores/chat'
-import { useTheme } from '@/composables/useTheme'
 
-const { theme, toggleTheme } = useTheme();
 const chatStore = useChatStore()
 const isLoading = ref(false);
-localStorage.setItem('chatSelect', false);
-const isSelectChat = (chatSelect) => {
 
-  localStorage.setItem('chatSelect', chatSelect);
+const formatLocalTime = (time) => {
+  if (!time) return '';
+  const date = new Date(time)
+  date.setHours(date.getHours() + 7)
+  return date.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
+
 onMounted(async () => {
   chatStore.isSelectChat = false;
   try {
@@ -88,103 +82,216 @@ onMounted(async () => {
   finally {
     isLoading.value = false;
   }
-  console.log('all conversation : ', chatStore.chatList)
 })
 </script>
+
 <style scoped>
-.chat-section {
-  background: var(--color-background);
-  height: 100vh;
-  padding: 16px 0;
-  padding-left: 16px;
-}
-
-.chat-list {
+.chat-list-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   background: var(--sidebar-bg);
-  height: calc(100vh - 32px);
-  border-radius: 10px;
-  width: 100%;
 }
 
-.search-chat {
-  color: var(--color-dark)
+.list-header {
+  border-bottom: 1px solid var(--color-border);
 }
 
-.chat {
-  transition: all 0.5s;
-  width: 100%;
+.header-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.chat:hover {
-  background: var(--sidebar-hover);
-  border-radius: 10px;
-}
-
-.conversationer {
-  align-content: center;
-  padding: 10px;
-  height: 80px;
-  width: 100%;
-  color: var(--color-text)
-}
-
-.conversationer.active {
-  background-color: var( --sidebar-active);
+.header-top h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0;
   color: var(--color-text);
+}
+
+.badge-count {
+  background: var(--color-danger);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.custom-search {
+  position: relative;
+  background: var(--color-background);
+  border-radius: 12px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.custom-search i {
+  color: var(--color-muted);
+}
+
+.custom-search input {
+  background: transparent;
+  border: none;
+  flex-grow: 1;
+  color: var(--color-text);
+  font-size: 0.9rem;
+}
+
+.custom-search input:focus {
+  outline: none;
+}
+
+.scrollable-area {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.chat-entry {
+  display: flex;
+  padding: 16px;
+  gap: 16px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid transparent;
+}
+
+.chat-entry:hover {
+  background: var(--color-hover);
+}
+
+.chat-entry.active {
+  background: var(--color-surface);
+  box-shadow: inset 4px 0 0 var(--color-primary);
+}
+
+.avatar-cell {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.user-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.status-dot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 3px solid var(--sidebar-bg);
+}
+
+.status-dot.online {
+  background: #10b981;
+}
+
+.unread-pill {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background: var(--color-danger);
+  color: white;
+  min-width: 20px;
+  height: 20px;
   border-radius: 10px;
-  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border: 2px solid var(--sidebar-bg);
 }
 
-.message {
-  max-width: 250px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  height: auto;
-  color: var(--color-background);
-  font-size: 14px;
+.info-cell {
+  flex-grow: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-.skeleton {
-  background: linear-gradient(90deg,
-      #e0e0e0 25%,
-      #f5f5f5 37%,
-      #e0e0e0 63%);
-  background-size: 400% 100%;
-  animation: shimmer 1.4s ease infinite;
-  border-radius: 8px;
+.name-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: 100% 0;
-  }
+.full-name {
+  font-weight: 700;
+  color: var(--color-text);
+}
 
-  100% {
-    background-position: -100% 0;
-  }
+.time-stamp {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+
+.message-row {
+  display: flex;
+}
+
+.last-msg-text {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  margin: 0;
+}
+
+/* Skeleton Loader Styles */
+.skeleton-item {
+  display: flex;
+  gap: 16px;
 }
 
 .skeleton-circle {
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
+  background: var(--color-border);
+  animation: pulse 1.5s infinite ease-in-out;
 }
 
-.skeleton-text {
-  height: 14px;
+.skeleton-line {
+  height: 12px;
+  background: var(--color-border);
+  border-radius: 4px;
+  animation: pulse 1.5s infinite ease-in-out;
 }
 
-.skeleton-small {
-  height: 10px;
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
+
+  100% {
+    opacity: 0.6;
+  }
 }
 
-.theme-btn {
-  border: 1px solid var(--border-color);
-  background: var(--color-secondary);
-  color: var(--color-text);
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  border: none;
-  cursor: pointer;
+/* Custom Scrollbar */
+.scrollable-area::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollable-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollable-area::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 10px;
 }
 </style>
