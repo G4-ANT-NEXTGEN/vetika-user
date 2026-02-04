@@ -85,6 +85,20 @@ const router = createRouter({
           name: 'view-profile',
           component: UserProfileView,
           meta: { title: 'UserProfile' }
+        },
+        {
+          path: '/chat',
+          name: 'chat-layout',
+          component: ChatLayout,
+          meta: { title: 'Chat' },
+          children: [
+            {
+              path: ':id',
+              name: 'chat-room',
+              component: ChatRoomView,
+              meta: { title: 'Conversation' }
+            }
+          ]
         }
       ]
     },
@@ -132,24 +146,6 @@ const router = createRouter({
           meta: { title: 'Preview User' },
         },
       ],
-    },
-    {
-      path: '/chat',
-      name: 'chat-layout',
-      component: ChatLayout,
-      meta: {
-        title: 'Chat'
-      },
-      children: [
-        {
-          path: ':id',
-          name: 'chat-room',
-          component: ChatRoomView,
-          meta: {
-            title: 'Conversation'
-          }
-        }
-      ]
     },
     {
       path: '/reset-password',

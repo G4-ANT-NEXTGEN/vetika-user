@@ -1,19 +1,23 @@
 <template>
-
-  <body style="background-color: var(--color-background)">
-    <div class="row">
-      <div class="col-3">
+  <div class="chat-app-container">
+    <div class="chat-layout-card">
+      <div class="chat-sidebar">
         <ChatListView />
       </div>
-      <div class="col-9">
-        <div v-if="!chatStore.isSelectChat" class="main-content d-flex justify-content-center align-items-center"
-          style="height:100vh">
-          <h3>Start message now...</h3>
+      <div class="chat-main">
+        <div v-if="!chatStore.isSelectChat" class="empty-selection">
+          <div class="empty-content">
+            <div class="illustration-wrapper mb-4">
+              <i class="bi bi-chat-heart"></i>
+            </div>
+            <h3>Your Messages</h3>
+            <p>Select a conversation from the list to start chatting.</p>
+          </div>
         </div>
-        <router-view />
+        <router-view v-else />
       </div>
     </div>
-  </body>
+  </div>
 </template>
 <script setup>
 import ChatListView from '@/views/chat/ChatListView.vue'
@@ -23,42 +27,82 @@ const chatStore = useChatStore()
 console.log('chatStore in layout : ', chatStore.isSelectChat)
 </script>
 <style scoped>
-.chat-section {
+.chat-app-container {
+  height: calc(100vh - 100px);
+  padding: 20px;
+  background-color: transparent;
+}
+
+.chat-layout-card {
+  height: 100%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  display: flex;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.chat-sidebar {
+  width: 350px;
+  height: 100%;
+  border-right: 1px solid var(--color-border);
+  background: var(--sidebar-bg);
+  flex-shrink: 0;
+}
+
+.chat-main {
+  flex-grow: 1;
+  height: 100%;
   background: var(--color-background);
-  height: 100vh;
-  padding: 16px 0;
-  padding-left: 16px;
+  position: relative;
 }
 
-.skeleton {
-  background: linear-gradient(90deg,
-      #e0e0e0 25%,
-      #f5f5f5 37%,
-      #e0e0e0 63%);
-  background-size: 400% 100%;
-  animation: shimmer 1.4s ease infinite;
-  border-radius: 8px;
+.empty-selection {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px;
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: 100% 0;
+.illustration-wrapper {
+  font-size: 5rem;
+  color: var(--color-muted);
+  opacity: 0.3;
+}
+
+.empty-content h3 {
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--color-text);
+}
+
+.empty-content p {
+  color: var(--color-muted);
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+@media (max-width: 991px) {
+  .chat-app-container {
+    padding: 0;
+    height: calc(100vh - 70px);
   }
 
-  100% {
-    background-position: -100% 0;
+  .chat-layout-card {
+    border-radius: 0;
+    border: none;
   }
-}
 
-.skeleton-circle {
-  border-radius: 50%;
-}
+  .chat-sidebar {
+    width: 100%;
+    display: v-bind('chatStore.isSelectChat ? "none" : "block"');
+  }
 
-.skeleton-text {
-  height: 14px;
-}
-
-.skeleton-small {
-  height: 10px;
+  .chat-main {
+    display: v-bind('chatStore.isSelectChat ? "block" : "none"');
+  }
 }
 </style>
