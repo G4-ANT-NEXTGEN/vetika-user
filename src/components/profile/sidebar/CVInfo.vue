@@ -162,6 +162,8 @@
             <div class="modal-pdf-viewer">
               <iframe v-if="currentCvData?.file" :src="currentCvData.file + '#toolbar=0&navpanes=0&scrollbar=0'"
                 class="pdf-iframe" frameborder="0"></iframe>
+
+
             </div>
           </div>
         </div>
@@ -200,7 +202,7 @@ const getCleanName = (url) => {
 const currentCvData = computed(() => {
   const cv = isOwnProfile.value ? profileStore.user?.cv : profileStore.viewUser?.cv
   if (!cv) return null
-
+  console.log('the cv : ',cv)
   if (typeof cv === 'string') {
     return {
       file: cv,

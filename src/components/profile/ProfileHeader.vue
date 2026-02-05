@@ -91,27 +91,47 @@
 
     <!-- Collaboration Modal -->
     <BaseModal v-if="editCollaboration" title="Add Collaboration" @close="closeEditCollaboration">
+
       <div class="collaboration-form">
         <div class="form-group">
-          <label class="form-label">Company Logo</label>
-          <div class="file-upload-area small">
-            <input class="file-input" type="file" id="collabFile" accept="image/*" />
+          <div class="d-flex justify-content-between">
+
+            <label class="form-label">Company Logo</label>
+            <p v-if="companyLogo" v-tippy="'click to cancel image'" @click="companyLogo = null"><i
+                class="fs-4 bi bi-x-circle"></i></p>
+          </div>
+          <div class="file-upload-area small" v-if="!companyLogo">
+
+            <input class="file-input" type="file" id="collabFile" multiple accept="image/*" @change="CompanyLogoSelect" />
             <label for="collabFile" class="file-upload-label">
               <i class="bi bi-image"></i>
               <span>Upload Logo</span>
             </label>
           </div>
+          <img v-if="CompanyLogoSelect" :src="companyLogoPreview" alt="">
         </div>
+<<<<<<< HEAD
+        <BaseInput label="Company Website" placeholder="https://example.com" @input="validateCompanyLink"
+          :error="errors.companyLink" v-model="companyLink" />
+=======
         <BaseInput label="Company Website" placeholder="https://example.com" />
+>>>>>>> 0eea236c0696581f9760e9169da36c63e5e7b289
       </div>
 
       <template #footer>
         <BaseButton @click="closeEditCollaboration" variant="secondary">Cancel
+<<<<<<< HEAD
+=======
         </BaseButton>
         <BaseButton @click="HandleEditCollaboration" variant="primary" :isLoading="profileStore.isLoading">
           Add Collaboration
+>>>>>>> 0eea236c0696581f9760e9169da36c63e5e7b289
         </BaseButton>
+        <base-button type="button" @click="addCollaboration"  variant="primary" :isLoading="profileStore.isLoading">
+          <span>{{ profileStore.isLoading ? 'Saving...' : 'Save' }}</span>
+        </base-button>
       </template>
+
     </BaseModal>
 
     <!-- Settings Modal -->
@@ -138,30 +158,40 @@
               <p>Update your password to keep your account secure</p>
             </div>
             <form @submit.prevent="changePassword">
-            <div class="form-group">
-              <BaseInput @input="validateCurrentPassword()" v-model="currentPass" :error="errors.currentPass" label="Current Password" type="password" placeholder="Enter current password" />
-            </div>
+              <div class="form-group">
+                <BaseInput @input="validateCurrentPassword()" v-model="currentPass" :error="errors.currentPass"
+                  label="Current Password" type="password" placeholder="Enter current password" />
+              </div>
 
-            <div class="form-group">
-              <BaseInput @input="validateNewPassword()" v-model="newPass" :error="errors.newPass" label="New Password" type="password" placeholder="Enter new password" />
-            </div>
+              <div class="form-group">
+                <BaseInput @input="validateNewPassword()" v-model="newPass" :error="errors.newPass" label="New Password"
+                  type="password" placeholder="Enter new password" />
+              </div>
 
-            <div class="form-group">
-              <BaseInput @input="validateComfirmPassword()" v-model="comfirmPass" :error="errors.comfirmPass" label="Confirm New Password" type="password" placeholder="Confirm new password" />
-            </div>
+              <div class="form-group">
+                <BaseInput @input="validateComfirmPassword()" v-model="comfirmPass" :error="errors.comfirmPass"
+                  label="Confirm New Password" type="password" placeholder="Confirm new password" />
+              </div>
 
-            <div class="password-requirements">
-              <span class="requirements-title">Password must contain:</span>
-              <ul>
-                <li>At least 8 characters</li>
-                <li>One uppercase letter</li>
-                <li>One number</li>
-              </ul>
-            </div>
+              <div class="password-requirements">
+                <span class="requirements-title">Password must contain:</span>
+                <ul>
+                  <li>At least 8 characters</li>
+                  <li>One uppercase letter</li>
+                  <li>One number</li>
+                </ul>
+              </div>
 
+<<<<<<< HEAD
+              <div class="form-actions">
+                <BaseButton variant="primary" type="submit" :isLoading="profileStore.isLoading">Update Password
+                </BaseButton>
+              </div>
+=======
             <div class="form-actions">
               <BaseButton variant="primary" type="submit" :isLoading="profileStore.isProcessing">Update Password</BaseButton>
             </div>
+>>>>>>> 0eea236c0696581f9760e9169da36c63e5e7b289
             </form>
           </div>
 
@@ -210,7 +240,7 @@
         <div class="modal-content-wrapper">
           <div class="cropper-container">
             <Cropper v-if="uploadedImage" ref="cropperCoverRef" :src="uploadedImage"
-              :stencil-props="{ aspectRatio: null, resizable: true,movable: true }" />
+              :stencil-props="{ aspectRatio: null, resizable: true, movable: true }" />
             <div v-else class="upload-placeholder">
               <div class="placeholder-icon">
                 <i class="bi bi-image"></i>
@@ -380,47 +410,77 @@ const cvFile = ref(null)
 const currentPass = ref()
 const newPass = ref()
 const comfirmPass = ref()
+<<<<<<< HEAD
+const companyLogo = ref()
+const companyLogoPreview = ref()
+=======
 const deleteAccount = ref(false)
 const companyLogo = ref()
+>>>>>>> 0eea236c0696581f9760e9169da36c63e5e7b289
 const companyLink = ref()
 
 onMounted(async () => {
   await profileStore.fetchProfile()
 })
+const addCollaboration = async () => {
+  if (!validateCompanyLink())
+    return
+  const formData = new FormData()
+  formData.append('company_logo', companyLogo.value)
+  formData.append('company_link', companyLink.value)
+  await profileStore.addCollaboration(formData)
+  editCollaboration.value=false
 
+}
+const validateCompanyLink = () => {
+  if (!companyLink.value) {
+    errors.companyLink = 'Company link is required'
+    return false
+  }
+  errors.companyLink = ''
+  return true
+}
+// const validateFormCollaboration = () => {
+//   const validCompanyLink = validateCompanyLink()
+// }
 const validateCurrentPassword = () => {
-  if(!currentPass.value){
+  if (!currentPass.value) {
 
     errors.currentPass = `Current Password is required`
     return false
   }
-    errors.currentPass = ''
-    return true
+  errors.currentPass = ''
+  return true
 }
 const validateNewPassword = () => {
-    const result = checkPassword(newPass.value)
-    errors.newPass = result.message
-    return result.isValid
+  const result = checkPassword(newPass.value)
+  errors.newPass = result.message
+  return result.isValid
 }
 const validateComfirmPassword = () => {
-    if (!comfirmPass.value) {
-        errors.comfirmPass = 'Confirm Password is required'
-        return false
-    }
-    errors.comfirmPass = ''
-    return true
+  if (!comfirmPass.value) {
+    errors.comfirmPass = 'Confirm Password is required'
+    return false
+  }
+  errors.comfirmPass = ''
+  return true
 }
+<<<<<<< HEAD
+const changePassword = async () => {
+  if (!validateForm())
+=======
 const comfirmDeleteAcc = async() => {
   await profileStore.deleteAccount()
   openSetting.value=false
 }
 const changePassword = async() => {
   if(!validateForm())
+>>>>>>> 0eea236c0696581f9760e9169da36c63e5e7b289
     return
   await profileStore.changePassword({
-    'old_pass':currentPass.value,
-    'new_pass':newPass.value,
-    'new_pass_confirmation':comfirmPass.value
+    'old_pass': currentPass.value,
+    'new_pass': newPass.value,
+    'new_pass_confirmation': comfirmPass.value
   })
   openSetting.value=false
   currentPass.value=null
@@ -428,19 +488,19 @@ const changePassword = async() => {
   comfirmPass.value=null
 }
 const validateForm = () => {
-    const currentPassValid = validateCurrentPassword()
-    const passwordValid = validateNewPassword()
-    const comfirmPasswordValid = validateComfirmPassword()
+  const currentPassValid = validateCurrentPassword()
+  const passwordValid = validateNewPassword()
+  const comfirmPasswordValid = validateComfirmPassword()
 
-    let isValid =currentPassValid && passwordValid && comfirmPasswordValid
+  let isValid = currentPassValid && passwordValid && comfirmPasswordValid
 
-    if (isValid && newPass.value !== comfirmPass.value) {
-        const matchResult = validatePasswordMatch(newPass.value, comfirmPass.value)
-        errors.comfirmPass = matchResult.message
-        isValid = false
-    }
+  if (isValid && newPass.value !== comfirmPass.value) {
+    const matchResult = validatePasswordMatch(newPass.value, comfirmPass.value)
+    errors.comfirmPass = matchResult.message
+    isValid = false
+  }
 
-    return isValid
+  return isValid
 }
 const handleFileSelect = (e) => {
   const file = e.target.files[0]
@@ -449,6 +509,16 @@ const handleFileSelect = (e) => {
   const reader = new FileReader()
   reader.onload = (ev) => (uploadedImage.value = ev.target.result)
   reader.readAsDataURL(file)
+}
+const CompanyLogoSelect = (e) => {
+  const logo = e.target.files[0]
+  if (!logo)
+    return false
+  companyLogo.value=logo
+  const reader = new FileReader()
+  reader.onload = (ev) => (companyLogoPreview.value = ev.target.result)
+  reader.readAsDataURL(logo)
+  return true
 }
 
 const applyCrop = async () => {
@@ -500,6 +570,7 @@ const handleSaveCv = async () => {
   console.log('this is cv file : ', cvFile.value)
   editCV.value = false
   cvFile.value = null
+  profileStore.fetchProfile()
 }
 
 const formatFileSize = (bytes) => {
