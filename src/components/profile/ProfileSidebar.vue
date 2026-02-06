@@ -101,7 +101,7 @@
           <BaseInput label="Phone" placeholder="Enter Your Phone Number" v-model="phone" />
         </div>
         <div class="col-md-6">
-          <BaseInput label="Date of Birth" placeholder="Enter Your Date of Birth" v-model="DOB" />
+          <BaseInput label="Date of Birth" type="date" placeholder="Enter Your Date of Birth" v-model="DOB" />
         </div>
         <div class="col-md-6">
           <label class="form-label">Gender</label>
