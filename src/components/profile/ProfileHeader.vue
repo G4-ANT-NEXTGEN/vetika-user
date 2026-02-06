@@ -172,10 +172,9 @@
                 </ul>
               </div>
 
-              <div class="form-actions">
-                <BaseButton variant="primary" type="submit" :isLoading="profileStore.isLoading">Update Password
-                </BaseButton>
-              </div>
+            <div class="form-actions">
+              <BaseButton variant="primary" type="submit" :isLoading="profileStore.isProcessing">Update Password</BaseButton>
+            </div>
             </form>
           </div>
 
@@ -394,6 +393,7 @@ const cvFile = ref(null)
 const currentPass = ref()
 const newPass = ref()
 const comfirmPass = ref()
+const deleteAccount = ref(false)
 const companyLogo = ref()
 const companyLogoPreview = ref()
 const companyLink = ref()
@@ -443,6 +443,10 @@ const validateComfirmPassword = () => {
   }
   errors.comfirmPass = ''
   return true
+}
+const comfirmDeleteAcc = async() => {
+  await profileStore.deleteAccount()
+  openSetting.value=false
 }
 const changePassword = async () => {
   if (!validateForm())

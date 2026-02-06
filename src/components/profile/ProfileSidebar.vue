@@ -90,16 +90,18 @@
     <BaseModal size="lg" v-if="personalUpdate" title="Update Personal Info" @close="closePersonalUpdate">
       <div class="row g-3">
         <div class="col-md-6">
-          <BaseInput label="Full Name" placeholder="Enter Your Full Name" v-model="full_name" @input="validateFullName" :error="errors.full_name" />
+          <BaseInput label="Full Name" placeholder="Enter Your Full Name" v-model="full_name" @input="validateFullName"
+            :error="errors.full_name" />
         </div>
         <div class="col-md-6">
-          <BaseInput label="Email" placeholder="Enter Your Email" v-model="email" type="email"  @input="validateEmail" :error="errors.email"/>
+          <BaseInput label="Email" placeholder="Enter Your Email" v-model="email" type="email" @input="validateEmail"
+            :error="errors.email" />
         </div>
         <div class="col-md-6">
           <BaseInput label="Phone" placeholder="Enter Your Phone Number" v-model="phone" />
         </div>
         <div class="col-md-6">
-          <BaseInput label="Date of Birth" placeholder="Enter Your Date of Birth" v-model="DOB" />
+          <BaseInput label="Date of Birth" type="date" placeholder="Enter Your Date of Birth" v-model="DOB" />
         </div>
         <div class="col-md-6">
           <label class="form-label">Gender</label>
@@ -132,7 +134,7 @@
     <!-- Update Skill Modal -->
     <BaseModal v-if="skillUpdate" title="Update Your Skills" @close="closeSkillUpdate">
       <div class="pb-5 mb-5">
-        <TomSelect v-model="skills" :options="skillOptions" multiple placeholder="Select skills..." />
+        <TomSelect v-model="skills" :options="skillOptions" multiple placeholder="Select skills..."/>
       </div>
       <template #footer>
         <BaseButton variant="secondary" @click="closeSkillUpdate">Cancel</BaseButton>
@@ -143,13 +145,16 @@
 
     <!-- Add Education Modal -->
     <BaseModal v-if="addNewEducation" title="Add New Education" @close="closeAddNewEducation">
-      <BaseSelect v-model="school" label="School/University" placeholder="Select School" :options="schoolOptions" />
+      <BaseSelect v-model="school" label="School/University" placeholder="Select School" :options="schoolOptions"
+        :error="errors.school" @change="validateSchool" />
       <div class="row g-3 my-2">
         <div class="col-6">
-          <BaseSelect v-model="degree" label="Degree" placeholder="Select Degree" :options="degreeOptions" />
+          <BaseSelect v-model="degree" label="Degree" placeholder="Select Degree" :options="degreeOptions"
+            :error="errors.degree" @change="validateDegree" />
         </div>
         <div class="col-6">
-          <BaseSelect v-model="subject" label="Subject" placeholder="Select Subject" :options="subjectOptions" />
+          <BaseSelect v-model="subject" label="Subject" placeholder="Select Subject" :options="subjectOptions"
+            @change="validateSubject" :error="errors.subject" />
         </div>
       </div>
       <div class="row g-3 my-2">
@@ -166,8 +171,8 @@
       </div>
       <template #footer>
         <BaseButton variant="secondary" @click="closeAddNewEducation">Cancel</BaseButton>
-        <BaseButton variant="primary" @click="HandleAddNewEducation" :isLoading="isLoading">
-          Add Education
+        <BaseButton variant="primary" @click="HandleAddNewEducation" :isLoading="educationStore.isLoading">
+          <span >{{ educationStore.isLoading ? 'Adding...' :'Add Education' }}</span>
         </BaseButton>
       </template>
     </BaseModal>
@@ -254,24 +259,56 @@ const UpdatePersonal = () => {
   portfolio_link.value = u?.portfolio_link || ''
   personalUpdate.value = true
 }
-const validateFullName = () =>{
-  if(!full_name.value){
-    errors.full_name='Name is required'
+const validateFullName = () => {
+  if (!full_name.value) {
+    errors.full_name = 'Name is required'
     return false
   }
-  errors.full_name=''
+  errors.full_name = ''
   return true
-
 }
 const validateEmail = () => {
-  if(!email.value){
-    errors.email='Email is required, example@gmail.com'
+  if (!email.value) {
+    errors.email = 'Email is required, example@gmail.com'
     return false
   }
-  errors.email=''
+  errors.email = ''
   return true
 }
+const validateSchool = () => {
+  if (!school.value) {
+    errors.school = 'School is required'
+    return false
+  }
+  errors.school = ''
+  return true
+}
+const validateSubject = () => {
+  if (!subject.value) {
+    errors.subject = 'Subject is required'
+    return false
+  }
+  errors.subject = ''
+  return true
+}
+const validateDegree = () => {
+  if (!degree.value) {
+    errors.degree = 'Degree is required'
+    return false
+  }
+  errors.degree = ''
+  return true
+}
+const validateForm = () => {
+  const isValid = ref(false)
+  const validSchool = validateSchool()
+  const validDegree = validateDegree()
+  const validSubject = validateSubject()
+  isValid.value = validDegree && validSchool && validSubject
+  if (!isValid.value) return false
+  return true
 
+}
 const closePersonalUpdate = () => personalUpdate.value = false
 
 const HandleUpdatePersonal = async () => {
@@ -308,14 +345,17 @@ const UpdateSkill = () => {
 }
 const closeSkillUpdate = () => skillUpdate.value = false
 const HandleUpdateSkill = async () => {
-  if (!skills.value.length) return showWarning('Select a skill!')
-  try {
-    await profileStore.updateProfessionalInfo({ skill_ids: skills.value })
+
+  console.log('this is skills id : ',skills.value)
+  await skillStore.updateSkills(skills.value)
+  // if (!skills.value.length) return showWarning('Select a skill!')
+  // try {
+  //   await profileStore.updateProfessionalInfo({ skill_ids: skills.value })
     skillUpdate.value = false
-    await postStore.fetchPosts()
-  } catch {
-    showError('Failed to update skills!')
-  }
+  //   await postStore.fetchPosts()
+  // } catch {
+  //   showError('Failed to update skills!')
+  // }
 }
 
 /* --- Education --- */
@@ -335,24 +375,19 @@ const openAddNewEducation = () => addNewEducation.value = true
 const closeAddNewEducation = () => addNewEducation.value = false
 
 const HandleAddNewEducation = async () => {
-  if (!school.value || !degree.value) return showWarning('Required fields missing!')
-  try {
-    isLoading.value = true
-    await educationStore.CreateEducation({
-      school_id: school.value,
-      degree_id: degree.value,
-      subject_id: subject.value,
-      start_date: start_date.value,
-      end_date: end_date.value,
-      description: description.value,
-    })
-    showSuccess('Education added!')
+  // if (!school.value || !degree.value) return
+
+  if (!validateForm()) return
+  await educationStore.CreateEducation({
+    school_id: school.value,
+    degree_id: degree.value,
+    subject_id: subject.value,
+    start_date: start_date.value,
+    end_date: end_date.value,
+    description: description.value,
+  })
     addNewEducation.value = false
-  } catch {
-    showError('Failed to add education!')
-  } finally {
-    isLoading.value = false
-  }
+
 }
 </script>
 
