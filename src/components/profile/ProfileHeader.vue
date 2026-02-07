@@ -82,9 +82,9 @@
       </div>
 
       <template #footer>
-        <BaseButton @click="closeEditCV" variant="secondary" :isLoading="profileStore.isLoading">Cancel</BaseButton>
-        <BaseButton @click="handleSaveCv" :isLoading="profileStore.isLoading" variant="primary" :disabled="!cvFile">
-          <span>{{ profileStore.isLoading ? 'Uploading...' : 'Upload CV' }}</span>
+        <BaseButton @click="closeEditCV" variant="secondary" :isLoading="profileStore.isProcessing">Cancel</BaseButton>
+        <BaseButton @click="handleSaveCv" :isLoading="profileStore.isProcessing" variant="primary" :disabled="!cvFile">
+          <span>{{ profileStore.isProcessing ? 'Uploading...' : 'Upload CV' }}</span>
         </BaseButton>
       </template>
     </BaseModal>
@@ -102,7 +102,8 @@
           </div>
           <div class="file-upload-area small" v-if="!companyLogo">
 
-            <input class="file-input" type="file" id="collabFile" multiple accept="image/*" @change="CompanyLogoSelect" />
+            <input class="file-input" type="file" id="collabFile" multiple accept="image/*"
+              @change="CompanyLogoSelect" />
             <label for="collabFile" class="file-upload-label">
               <i class="bi bi-image"></i>
               <span>Upload Logo</span>
@@ -117,7 +118,7 @@
       <template #footer>
         <BaseButton @click="closeEditCollaboration" variant="secondary">Cancel
         </BaseButton>
-        <base-button type="button" @click="addCollaboration"  variant="primary" :isLoading="profileStore.isLoading">
+        <base-button type="button" @click="addCollaboration" variant="primary" :isLoading="profileStore.isLoading">
           <span>{{ profileStore.isLoading ? 'Saving...' : 'Save' }}</span>
         </base-button>
       </template>
@@ -172,9 +173,10 @@
                 </ul>
               </div>
 
-            <div class="form-actions">
-              <BaseButton variant="primary" type="submit" :isLoading="profileStore.isProcessing">Update Password</BaseButton>
-            </div>
+              <div class="form-actions">
+                <BaseButton variant="primary" type="submit" :isLoading="profileStore.isProcessing">Update Password
+                </BaseButton>
+              </div>
             </form>
           </div>
 
@@ -203,15 +205,15 @@
       </div>
     </BaseModal>
     <!-- modal comfirm delete account -->
-     <BaseModal v-if="deleteAccount" title="Comfirm Delete Account" @close="deleteAccount = false">
+    <BaseModal v-if="deleteAccount" title="Comfirm Delete Account" @close="deleteAccount = false">
       <p>Are you sure?</p>
       <template #footer>
         <div class="d-flex justify-content-end">
           <!-- <base-button>Cancel</base-button> -->
           <BaseButton variant="danger" @click="comfirmDeleteAcc" :isLoading="profileStore.isLoading">
-                <i class="bi bi-trash"></i>
-                <span> Confirm</span>
-              </BaseButton>
+            <i class="bi bi-trash"></i>
+            <span> Confirm</span>
+          </BaseButton>
 
         </div>
       </template>
@@ -408,7 +410,7 @@ const addCollaboration = async () => {
   formData.append('company_logo', companyLogo.value)
   formData.append('company_link', companyLink.value)
   await profileStore.addCollaboration(formData)
-  editCollaboration.value=false
+  editCollaboration.value = false
 
 }
 const validateCompanyLink = () => {
@@ -444,9 +446,9 @@ const validateComfirmPassword = () => {
   errors.comfirmPass = ''
   return true
 }
-const comfirmDeleteAcc = async() => {
+const comfirmDeleteAcc = async () => {
   await profileStore.deleteAccount()
-  openSetting.value=false
+  openSetting.value = false
 }
 const changePassword = async () => {
   if (!validateForm())
@@ -456,10 +458,10 @@ const changePassword = async () => {
     'new_pass': newPass.value,
     'new_pass_confirmation': comfirmPass.value
   })
-  openSetting.value=false
-  currentPass.value=null
-  newPass.value=null
-  comfirmPass.value=null
+  openSetting.value = false
+  currentPass.value = null
+  newPass.value = null
+  comfirmPass.value = null
 }
 const validateForm = () => {
   const currentPassValid = validateCurrentPassword()
@@ -488,7 +490,7 @@ const CompanyLogoSelect = (e) => {
   const logo = e.target.files[0]
   if (!logo)
     return false
-  companyLogo.value=logo
+  companyLogo.value = logo
   const reader = new FileReader()
   reader.onload = (ev) => (companyLogoPreview.value = ev.target.result)
   reader.readAsDataURL(logo)
@@ -540,11 +542,18 @@ const cvOnChangeFile = (e) => {
 
 const handleSaveCv = async () => {
   if (!cvFile.value) return
-  await profileStore.uploadCv(cvFile.value)
-  console.log('this is cv file : ', cvFile.value)
-  editCV.value = false
-  cvFile.value = null
-  profileStore.fetchProfile()
+  profileStore.isProcessing = true
+  try {
+    await profileStore.uploadCv(cvFile.value)
+    // Modal will close after toast is shown by the store
+    editCV.value = false
+    cvFile.value = null
+  } catch (error) {
+    showError(error.message)
+  } finally {
+    profileStore.isProcessing = false
+    profileStore.fetchProfile()
+  }
 }
 
 const formatFileSize = (bytes) => {

@@ -617,7 +617,7 @@ section {
   padding: 6px 16px;
   background: var(--color-surface);
   border-radius: 50px;
-  color: var(--color-accent);
+  color: var(--color-text);
   font-size: 0.875rem;
   font-weight: 600;
   letter-spacing: 0.5px;

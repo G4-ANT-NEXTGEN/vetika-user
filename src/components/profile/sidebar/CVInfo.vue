@@ -113,131 +113,164 @@
         </div>
       </div>
 
-    <!-- Full Screen PDF Modal -->
-    <Teleport to="body">
-      <Transition name="modal">
-        <div v-if="showModal" class="pdf-modal-overlay" @click.self="showModal = false">
-          <div class="pdf-modal-content">
-            <!-- Modal Header -->
-            <div class="modal-header-bar">
-              <div class="modal-title-section">
-                <i class="bi bi-file-earmark-pdf"></i>
-                <div class="title-text">
-                  <h3>{{ currentCvData?.name }}</h3>
-                  <span>PDF Document</span>
-                </div>
-              </div>
-              <div class="modal-header-actions">
-                <button
-                  class="modal-action-btn"
-                  @click="handleDownloadCv"
-                  :disabled="isDownloading"
-                  title="Download"
-                >
-                  <i class="bi bi-download"></i>
-                </button>
-                <button class="modal-action-btn" @click="handlePrintCv" title="Print">
-                  <i class="bi bi-printer"></i>
-                </button>
-                <button class="modal-close-btn" @click="showModal = false" title="Close">
-                  <i class="bi bi-x-lg"></i>
-                </button>
-              </div>
-            </div>
-
-            <!-- PDF Viewer -->
-            <div class="modal-pdf-viewer">
-              <iframe
-                v-if="currentCvData?.file"
-                :src="currentCvData.file + '#toolbar=0&navpanes=0&scrollbar=0'"
-                class="pdf-iframe"
-                frameborder="0"
-              ></iframe>
-            </div>
-          </div>
-        </div>
-      </Transition>
-    </Teleport>
-
-    <!-- Share CV Modal (Improved) -->
-    <Teleport to="body">
-      <Transition name="modal">
-        <div v-if="showShareModal" class="share-overlay" @click.self="showShareModal = false">
-          <div class="share-modal improved">
-            <header class="share-header">
-              <div class="share-header-left">
-                <h3 class="label primary">Share CV</h3>
-                <p class="muted">Share your CV quickly via link, email, or social platforms.</p>
-              </div>
-              <div class="share-header-right">
-                <button class="modal-close-btn" @click="showShareModal = false" aria-label="Close share modal">
-                  <i class="bi bi-x-lg"></i>
-                </button>
-              </div>
-            </header>
-
-            <div class="share-body">
-              <div class="share-left">
-                <div class="cv-preview-card">
-                  <img v-if="currentCvData?.image" :src="currentCvData.image" alt="CV preview" />
-                  <div class="cv-meta">
-                    <strong class="cv-name">{{ currentCvData?.name }}</strong>
-                    <span class="cv-updated">{{ currentCvData?.updated_at }}</span>
-                  </div>
-                  <div class="cv-actions">
-                    <button class="btn small" @click="handleDownloadCv" :disabled="isDownloading">
-                      <i class="bi bi-download"></i>
-                      <span>{{ isDownloading ? 'Downloading...' : 'Download' }}</span>
-                    </button>
-                    <button class="btn small" @click="showModal = true">
-                      <i class="bi bi-arrows-fullscreen"></i>
-                      <span>View</span>
-                    </button>
+      <!-- Full Screen PDF Modal -->
+      <Teleport to="body">
+        <Transition name="modal">
+          <div v-if="showModal" class="pdf-modal-overlay" @click.self="showModal = false">
+            <div class="pdf-modal-content">
+              <!-- Modal Header -->
+              <div class="modal-header-bar">
+                <div class="modal-title-section">
+                  <i class="bi bi-file-earmark-pdf"></i>
+                  <div class="title-text">
+                    <h3>{{ currentCvData?.name }}</h3>
+                    <span>PDF Document</span>
                   </div>
                 </div>
+                <div class="modal-header-actions">
+                  <button class="modal-action-btn" @click="handleDownloadCv" :disabled="isDownloading" title="Download">
+                    <i class="bi bi-download"></i>
+                  </button>
+                  <button class="modal-action-btn" @click="handlePrintCv" title="Print">
+                    <i class="bi bi-printer"></i>
+                  </button>
+                  <button class="modal-close-btn" @click="showModal = false" title="Close">
+                    <i class="bi bi-x-lg"></i>
+                  </button>
+                </div>
               </div>
 
-              <div class="share-right">
-                <label class="share-label label primary">Shareable link</label>
-                <div class="share-link-row">
-                  <input class="share-input label primary" :value="currentCvData?.file || ''" readonly />
-                  <button class="btn copy-btn" @click="handleShareCv('link')">
-                    <i class="bi bi-clipboard"></i>
-                    <span>{{ copyLinkSuccess ? 'Copied' : 'Copy' }}</span>
-                  </button>
-                </div>
-
-                <div class="share-grid">
-                  <button class="share-action whatsapp" @click="handleShareCv('whatsapp')">
-                    <i class="bi bi-whatsapp"></i>
-                    <span>WhatsApp</span>
-                  </button>
-                  <button class="share-action linkedin" @click="handleShareCv('linkedin')">
-                    <i class="bi bi-linkedin"></i>
-                    <span>LinkedIn</span>
-                  </button>
-                  <button class="share-action twitter" @click="handleShareCv('twitter')">
-                    <i class="bi bi-twitter-x"></i>
-                    <span>Twitter</span>
-                  </button>
-                  <button class="share-action facebook" @click="handleShareCv('facebook')">
-                    <i class="bi bi-facebook"></i>
-                    <span>Facebook</span>
-                  </button>
-                  <button class="share-action email" @click="handleShareCv('email')">
-                    <i class="bi bi-envelope-fill"></i>
-                    <span>Email</span>
-                  </button>
-                </div>
-
-                <p class="share-help muted label primary">NOTE: If a popup is blocked, allow popups for this site or use the copy link option.</p>
+              <!-- PDF Viewer -->
+              <div class="modal-pdf-viewer">
+                <iframe v-if="currentCvData?.file" :src="currentCvData.file + '#toolbar=0&navpanes=0&scrollbar=0'"
+                  class="pdf-iframe" frameborder="0"></iframe>
               </div>
             </div>
           </div>
+        </Transition>
+      </Teleport>
+
+      <!-- Upload CV Modal -->
+      <BaseModal v-if="cvUpdateModal" title="Upload Your CV" @close="closeEditCV">
+        <div class="upload-section">
+          <div class="file-upload-area" :class="{ 'has-file': cvFile }">
+            <input class="file-input" type="file" id="cvFile" @change="cvOnChangeFile" accept="application/pdf" />
+            <label for="cvFile" class="file-upload-label">
+              <div class="upload-icon">
+                <i class="bi bi-cloud-arrow-up"></i>
+              </div>
+              <div class="upload-text">
+                <span class="primary-text">Drop your CV here or click to browse</span>
+                <span class="secondary-text">PDF files only • Max 10MB</span>
+              </div>
+            </label>
+          </div>
+
+          <div v-if="cvFile" class="file-preview">
+            <div class="file-icon">
+              <i class="bi bi-file-earmark-pdf"></i>
+            </div>
+            <div class="file-info">
+              <span class="file-name">{{ cvFile.name }}</span>
+              <span class="file-size">{{ formatFileSize(cvFile.size) }}</span>
+            </div>
+            <button @click="cvFile = null" class="remove-file">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </div>
         </div>
-      </Transition>
-    </Teleport>
-  </div>
+
+        <template #footer>
+          <BaseButton @click="closeEditCV" variant="secondary" :isLoading="profileStore.isProcessing">Cancel
+          </BaseButton>
+          <BaseButton @click="handleSaveCv" :isLoading="profileStore.isProcessing" variant="primary"
+            :disabled="!cvFile">
+            <span>{{ profileStore.isProcessing ? 'Uploading...' : 'Upload CV' }}</span>
+          </BaseButton>
+        </template>
+      </BaseModal>
+
+      <!-- Share CV Modal (Improved) -->
+      <Teleport to="body">
+        <Transition name="modal">
+          <div v-if="showShareModal" class="share-overlay" @click.self="showShareModal = false">
+            <div class="share-modal improved">
+              <header class="share-header">
+                <div class="share-header-left">
+                  <h3 class="label primary">Share CV</h3>
+                  <p class="muted">Share your CV quickly via link, email, or social platforms.</p>
+                </div>
+                <div class="share-header-right">
+                  <button class="modal-close-btn" @click="showShareModal = false" aria-label="Close share modal">
+                    <i class="bi bi-x-lg"></i>
+                  </button>
+                </div>
+              </header>
+
+              <div class="share-body">
+                <div class="share-left">
+                  <div class="cv-preview-card">
+                    <img v-if="currentCvData?.image" :src="currentCvData.image" alt="CV preview" />
+                    <div class="cv-meta">
+                      <strong class="cv-name">{{ currentCvData?.name }}</strong>
+                      <span class="cv-updated">{{ currentCvData?.updated_at }}</span>
+                    </div>
+                    <div class="cv-actions">
+                      <button class="btn small" @click="handleDownloadCv" :disabled="isDownloading">
+                        <i class="bi bi-download"></i>
+                        <span>{{ isDownloading ? 'Downloading...' : 'Download' }}</span>
+                      </button>
+                      <button class="btn small" @click="showModal = true">
+                        <i class="bi bi-arrows-fullscreen"></i>
+                        <span>View</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="share-right">
+                  <label class="share-label label primary">Shareable link</label>
+                  <div class="share-link-row">
+                    <input class="share-input label primary" :value="currentCvData?.file || ''" readonly />
+                    <button class="btn copy-btn" @click="handleShareCv('link')">
+                      <i class="bi bi-clipboard"></i>
+                      <span>{{ copyLinkSuccess ? 'Copied' : 'Copy' }}</span>
+                    </button>
+                  </div>
+
+                  <div class="share-grid">
+                    <button class="share-action whatsapp" @click="handleShareCv('whatsapp')">
+                      <i class="bi bi-whatsapp"></i>
+                      <span>WhatsApp</span>
+                    </button>
+                    <button class="share-action linkedin" @click="handleShareCv('linkedin')">
+                      <i class="bi bi-linkedin"></i>
+                      <span>LinkedIn</span>
+                    </button>
+                    <button class="share-action twitter" @click="handleShareCv('twitter')">
+                      <i class="bi bi-twitter-x"></i>
+                      <span>Twitter</span>
+                    </button>
+                    <button class="share-action facebook" @click="handleShareCv('facebook')">
+                      <i class="bi bi-facebook"></i>
+                      <span>Facebook</span>
+                    </button>
+                    <button class="share-action email" @click="handleShareCv('email')">
+                      <i class="bi bi-envelope-fill"></i>
+                      <span>Email</span>
+                    </button>
+                  </div>
+
+                  <p class="share-help muted label primary">NOTE: If a popup is blocked, allow popups for this site or
+                    use the
+                    copy link option.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Transition>
+      </Teleport>
+    </div>
   </div>
 </template>
 
@@ -249,6 +282,8 @@ import BaseButton from '@/components/ui/base/BaseButton.vue'
 const profileStore = useProfileStore()
 const showModal = ref(false)
 const showShareModal = ref(false)
+const cvUpdateModal = ref(false)
+const cvFile = ref(null)
 const isDownloading = ref(false)
 const copyLinkSuccess = ref(false)
 
@@ -301,7 +336,47 @@ const currentCvData = computed(() => {
 })
 
 const UpdateCV = () => {
-  console.log('Update CV triggered')
+  cvUpdateModal.value = true
+}
+
+const closeEditCV = () => {
+  cvUpdateModal.value = false
+  cvFile.value = null
+}
+
+const cvOnChangeFile = (e) => {
+  const file = e.target.files[0]
+  if (!file) return
+  if (file.type !== 'application/pdf') {
+    alert('Only PDF files are allowed')
+    return
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    alert('File size must be less than 10MB')
+    return
+  }
+  cvFile.value = file
+}
+
+const formatFileSize = (bytes) => {
+  if (bytes < 1024) return bytes + ' B'
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+}
+
+const handleSaveCv = async () => {
+  if (!cvFile.value) return
+  profileStore.isProcessing = true
+  try {
+    await profileStore.uploadCv(cvFile.value)
+    cvUpdateModal.value = false
+    cvFile.value = null
+  } catch (error) {
+    console.error('Error uploading CV:', error)
+  } finally {
+    profileStore.isProcessing = false
+    profileStore.fetchProfile()
+  }
 }
 
 const handleDownloadCv = async () => {
@@ -465,9 +540,11 @@ onMounted(async () => {
   color: var(--color-background);
   box-shadow: var(--shadow-sm);
 }
-.label.primary{
-  color:var(--color-primary)
+
+.label.primary {
+  color: var(--color-primary)
 }
+
 .action-btn.primary:hover {
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
@@ -724,6 +801,7 @@ onMounted(async () => {
   justify-content: center;
   z-index: 9999;
 }
+
 .share-modal.improved {
   width: 920px;
   max-width: calc(100% - 40px);
@@ -732,6 +810,7 @@ onMounted(async () => {
   overflow: hidden;
   box-shadow: var(--shadow-xl);
 }
+
 .share-header {
   display: flex;
   justify-content: space-between;
@@ -739,31 +818,145 @@ onMounted(async () => {
   padding: 18px 20px;
   border-bottom: 1px solid var(--color-border);
 }
-.share-header .muted { color: var(--color-text); font-size: 13px; margin: 4px 0 0 }
-.share-body { display: flex; gap: 20px; padding: 20px; }
-.share-left { width: 38%; }
-.cv-preview-card { background: var(--color-accent); padding: 14px; border-radius: 8px; display:flex; flex-direction:column; gap:12px; align-items:center; }
-.cv-preview-card img { width:100%; height:180px; object-fit:cover; border-radius:6px; }
-.cv-meta { text-align:center }
-.cv-name { display:block; margin-top:6px }
-.cv-updated { font-size:12px; color:var(--color-muted) }
-.cv-actions { display:flex; gap:8px; margin-top:8px }
-.btn.small { padding:6px 10px; border-radius:6px; font-size:13px }
-.share-right { width: 62%; display:flex; flex-direction:column; gap:12px }
-.share-link-row { display:flex; gap:8px; align-items:center }
-.share-input { flex:1; padding:10px 12px; border-radius:8px; border:1px solid var(--color-border); background:var(--color-surface); }
-.btn.copy-btn { padding:10px 12px; border-radius:8px }
-.share-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top:6px }
-.share-action { display:flex; align-items:center; gap:10px; padding:10px; border-radius:8px; background:var(--color-hover); border:1px solid var(--color-border); cursor:pointer; }
-.share-action i { font-size:18px }
-.share-action.whatsapp { background: linear-gradient(90deg,#25D366,#128C7E); color:#fff }
-.share-action.linkedin { background: linear-gradient(90deg,#0A66C2,#0E76A8); color:#fff }
-.share-action.twitter { background: linear-gradient(90deg,#1DA1F2,#0D95E8); color:#fff }
-.share-action.facebook { background: linear-gradient(90deg,#1877F2,#0F62C9); color:#fff }
-.share-action.email { background: var(--color-primary); color:var(--color-background) }
-.share-help { font-size:12px }
+
+.share-header .muted {
+  color: var(--color-text);
+  font-size: 13px;
+  margin: 4px 0 0
+}
+
+.share-body {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+}
+
+.share-left {
+  width: 38%;
+}
+
+.cv-preview-card {
+  background: var(--color-accent);
+  padding: 14px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+.cv-preview-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.cv-meta {
+  text-align: center
+}
+
+.cv-name {
+  display: block;
+  margin-top: 6px
+}
+
+.cv-updated {
+  font-size: 12px;
+  color: var(--color-muted)
+}
+
+.cv-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px
+}
+
+.btn.small {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px
+}
+
+.share-right {
+  width: 62%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px
+}
+
+.share-link-row {
+  display: flex;
+  gap: 8px;
+  align-items: center
+}
+
+.share-input {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.btn.copy-btn {
+  padding: 10px 12px;
+  border-radius: 8px
+}
+
+.share-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 6px
+}
+
+.share-action {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  background: var(--color-hover);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+}
+
+.share-action i {
+  font-size: 18px
+}
+
+.share-action.whatsapp {
+  background: linear-gradient(90deg, #25D366, #128C7E);
+  color: #fff
+}
+
+.share-action.linkedin {
+  background: linear-gradient(90deg, #0A66C2, #0E76A8);
+  color: #fff
+}
+
+.share-action.twitter {
+  background: linear-gradient(90deg, #1DA1F2, #0D95E8);
+  color: #fff
+}
+
+.share-action.facebook {
+  background: linear-gradient(90deg, #1877F2, #0F62C9);
+  color: #fff
+}
+
+.share-action.email {
+  background: var(--color-primary);
+  color: var(--color-background)
+}
+
+.share-help {
+  font-size: 12px
+}
 
 @keyframes pulse-dot {
+
   0%,
   100% {
     opacity: 1;
@@ -857,6 +1050,7 @@ onMounted(async () => {
 }
 
 @keyframes float {
+
   0%,
   100% {
     transform: translateY(0);
@@ -957,7 +1151,7 @@ onMounted(async () => {
   min-width: 0;
 }
 
-.modal-title-section > i {
+.modal-title-section>i {
   font-size: 20px;
   color: var(--color-text);
   flex-shrink: 0;
@@ -1162,5 +1356,139 @@ onMounted(async () => {
     height: 40px;
     font-size: 18px;
   }
+}
+
+/* ====================================
+   FILE UPLOAD SECTION
+   ==================================== */
+.upload-section {
+  padding: 8px 0;
+}
+
+.file-upload-area {
+  position: relative;
+  border: 2px dashed var(--color-border);
+  border-radius: 12px;
+  padding: 48px 24px;
+  text-align: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.file-upload-area:hover {
+  border-color: var(--color-primary);
+  background: var(--color-hover);
+}
+
+.file-upload-area.has-file {
+  border-color: var(--color-primary);
+  background: var(--color-hover);
+}
+
+.file-input {
+  display: none;
+}
+
+.file-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.upload-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  color: var(--color-primary);
+  font-size: 24px;
+}
+
+.upload-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.primary-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.secondary-text {
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+.file-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: var(--color-accent);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  margin-top: 16px;
+}
+
+.file-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 8px;
+  color: #ef4444;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.file-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.file-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-size {
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.remove-file {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.remove-file:hover {
+  background: var(--color-hover);
+  color: #ef4444;
 }
 </style>

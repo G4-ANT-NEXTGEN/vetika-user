@@ -102,10 +102,10 @@
 
         <div class="row g-3 mb-4">
           <div class="col-md-6">
-            <BaseInput label="Start Date" placeholder="YYYY-MM" v-model="start_date" />
+            <BaseInput type="date" label="Start Date" placeholder="YYYY-MM" v-model="start_date" />
           </div>
           <div class="col-md-6">
-            <BaseInput label="End Date" placeholder="YYYY-MM or Present" v-model="end_date" />
+            <BaseInput type="date" label="End Date" placeholder="YYYY-MM or Present" v-model="end_date" />
           </div>
         </div>
 
@@ -236,8 +236,8 @@ const HandleAddNewEducation = async () => {
     school_id: school.value,
     degree_id: degree.value,
     subject_id: subject.value,
-    start_date: start_date.value,
-    end_date: end_date.value,
+    start_date: start_date.value ? start_date.value.slice(0, 7) : '',
+    end_date: end_date.value ? end_date.value.slice(0, 7) : '',
     description: description.value,
   }
 

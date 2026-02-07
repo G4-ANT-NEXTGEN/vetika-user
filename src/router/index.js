@@ -24,6 +24,7 @@ import UserProfileView from '@/views/profile/UserProfileView.vue'
 
 import ChatLayout from '@/layout/ChatLayout.vue'
 import ChatRoomView from '@/views/chat/ChatRoomView.vue'
+import NotFoundView from '@/views/NotFoundView.vue'
 
 
 
@@ -179,10 +180,11 @@ const router = createRouter({
         },
       ],
     },
-
     {
       path: '/:pathMatch(.*)*',
-      redirect: { name: 'login' },
+      name: 'not-found',
+      component: NotFoundView,
+      meta: { title: '404 Not Found' }
     },
   ],
   linkExactActiveClass: 'active'
@@ -199,13 +201,13 @@ router.beforeEach(async (to) => {
       await authStore.fetchProfile()
     } catch {
       authStore.logout()
-      return { name: 'login' }
+      return { name: 'landing' }
     }
   }
 
   // If user is authenticated (has token), redirect from login only
   if (authStore.isAuthenticated) {
-    if (to.name === 'login') {
+    if (to.name === 'login' || to.name === 'landing') {
       return { name: 'home' }
     }
     // Authenticated users can access all other routes including register
@@ -214,7 +216,7 @@ router.beforeEach(async (to) => {
 
   // If not authenticated, redirect to login for protected routes
   if (to.meta.requiresAuth) {
-    return { name: 'login' }
+    return { name: 'landing' }
   }
 
   return true

@@ -215,7 +215,7 @@ const OpenModeledit = async (id) => {
     if (!post) return;
 
     titlePost.value = post.text || '';
-    const isDefaultPath = post.image === 'http://novia2.csm.linkpc.net/storage/posts';
+    const isDefaultPath = post.image === 'https://novia2.csm.linkpc.net/storage/posts';
     file.value = isDefaultPath ? null : (post.image || null);
     imgPost.value = isDefaultPath ? null : (post.image || null);
     attachment.value = null;

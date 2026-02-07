@@ -64,6 +64,7 @@
 import { useChatStore } from '@/stores/chat'
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import moment from 'moment-timezone'
 
 
 const route = useRoute()
@@ -73,12 +74,7 @@ const isLoading = ref()
 
 const formatLocalTime = (time) => {
   if (!time) return '';
-  const date = new Date(time)
-  date.setHours(date.getHours() + 7)
-  return date.toLocaleTimeString([], {
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+  return moment.utc(time).local().format('hh:mm A');
 }
 const roomUser = computed(() => {
   if (conversationMessage.value.length > 0) {
@@ -259,7 +255,6 @@ onMounted(async () => {
   padding: 12px 18px;
   border-radius: 20px 20px 20px 4px;
   background: var(--color-surface);
-  box-shadow: var(--shadow-sm);
   position: relative;
 }
 
@@ -294,7 +289,6 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   padding: 6px 12px;
-  box-shadow: var(--shadow-md);
 }
 
 .util-btn,

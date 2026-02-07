@@ -87,7 +87,7 @@ const filteredChats = computed(() => {
     return {
       ...chat,
       lastMessage: lastMsg?.message || '',
-      time: lastMsg ? moment(lastMsg.created_at).format('h:mm A') : '',
+      time: lastMsg ? moment.utc(lastMsg.created_at).local().format('hh:mm A') : '',
       isOnline: true,
       unreadCount: 0
     };
@@ -287,7 +287,7 @@ defineOptions({
 
 /* Messages List */
 .messages-list {
-  max-height: 400px;
+  max-height: 800px;
   overflow-y: auto;
   margin-bottom: 10px;
 }

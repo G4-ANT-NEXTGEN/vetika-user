@@ -65,7 +65,7 @@
 
       <!-- Card 4: More Details (Education & Projects Link) -->
       <div class="sidebar-card info-summary">
-        <h3 class="card-title">Education Summary</h3>
+        <h3 class="card-title mb-4">Education Summary</h3>
         <div class="summary-list">
           <div v-for="edu in profileStore.user?.educations?.slice(0, 2)" :key="edu.id" class="summary-item">
             <i class="bi bi-mortarboard-fill"></i>
@@ -132,19 +132,20 @@
     </BaseModal>
 
     <!-- Update Skill Modal -->
-    <BaseModal v-if="skillUpdate" title="Update Your Skills" @close="closeSkillUpdate">
+    <BaseModal size="lg" v-if="skillUpdate" title="Update Your Skills" @close="closeSkillUpdate">
       <div class="pb-5 mb-5">
-        <TomSelect v-model="skills" :options="skillOptions" multiple placeholder="Select skills..."/>
+        <TomSelect v-model="skills" :options="skillOptions" multiple placeholder="Select skills..." />
       </div>
       <template #footer>
         <BaseButton variant="secondary" @click="closeSkillUpdate">Cancel</BaseButton>
-        <BaseButton variant="primary" @click="HandleUpdateSkill" :isLoading="skillStore.isProcessing"><span>{{ skillStore.isProcessing ? 'Saving...' : 'Save Changes'}}</span>
+        <BaseButton variant="primary" @click="HandleUpdateSkill" :isLoading="skillStore.isProcessing"><span>{{
+          skillStore.isProcessing ? 'Saving...' : 'Save Changes' }}</span>
         </BaseButton>
       </template>
     </BaseModal>
 
     <!-- Add Education Modal -->
-    <BaseModal v-if="addNewEducation" title="Add New Education" @close="closeAddNewEducation">
+    <BaseModal size="lg" v-if="addNewEducation" title="Add New Education" @close="closeAddNewEducation">
       <BaseSelect v-model="school" label="School/University" placeholder="Select School" :options="schoolOptions"
         :error="errors.school" @change="validateSchool" />
       <div class="row g-3 my-2">
@@ -159,10 +160,10 @@
       </div>
       <div class="row g-3 my-2">
         <div class="col-6">
-          <BaseInput label="Start Date" placeholder="Year-Month" v-model="start_date" />
+          <BaseInput type="date" label="Start Date" placeholder="Year-Month" v-model="start_date" />
         </div>
         <div class="col-6">
-          <BaseInput label="End Date " placeholder="Year-Month" v-model="end_date" />
+          <BaseInput type="date" label="End Date " placeholder="Year-Month" v-model="end_date" />
         </div>
       </div>
       <div class="mb-3">
@@ -172,7 +173,7 @@
       <template #footer>
         <BaseButton variant="secondary" @click="closeAddNewEducation">Cancel</BaseButton>
         <BaseButton variant="primary" @click="HandleAddNewEducation" :isLoading="educationStore.isLoading">
-          <span >{{ educationStore.isLoading ? 'Adding...' :'Add Education' }}</span>
+          <span>{{ educationStore.isLoading ? 'Adding...' : 'Add Education' }}</span>
         </BaseButton>
       </template>
     </BaseModal>
@@ -328,6 +329,7 @@ const HandleUpdatePersonal = async () => {
     }
     await profileStore.updatePersonalInfo(payload)
     personalUpdate.value = false
+    showSuccess('Profile updated successfully!')
     await postStore.fetchPosts()
   } catch {
     showError('Failed to update profile!')
@@ -346,8 +348,8 @@ const UpdateSkill = () => {
 const closeSkillUpdate = () => skillUpdate.value = false
 const HandleUpdateSkill = async () => {
   await skillStore.updateSkills(skills.value)
-  
-    skillUpdate.value = false
+  await profileStore.fetchProfile()
+  skillUpdate.value = false
 }
 
 /* --- Education --- */
@@ -367,19 +369,31 @@ const openAddNewEducation = () => addNewEducation.value = true
 const closeAddNewEducation = () => addNewEducation.value = false
 
 const HandleAddNewEducation = async () => {
-  // if (!school.value || !degree.value) return
-
   if (!validateForm()) return
+
+  // Format dates to YYYY-MM if they exist
+  const formattedStart = start_date.value ? start_date.value.slice(0, 7) : ''
+  const formattedEnd = end_date.value ? end_date.value.slice(0, 7) : ''
+
   await educationStore.CreateEducation({
     school_id: school.value,
     degree_id: degree.value,
     subject_id: subject.value,
-    start_date: start_date.value,
-    end_date: end_date.value,
+    start_date: formattedStart,
+    end_date: formattedEnd,
     description: description.value,
   })
-    addNewEducation.value = false
 
+  // Reset fields
+  school.value = ''
+  degree.value = ''
+  subject.value = ''
+  start_date.value = ''
+  end_date.value = ''
+  description.value = ''
+
+  addNewEducation.value = false
+  await profileStore.fetchProfile()
 }
 </script>
 

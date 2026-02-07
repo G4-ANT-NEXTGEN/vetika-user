@@ -3,7 +3,7 @@
     <!-- Card When view own profile -->
     <InfoCard v-if="isOwnProfile" title="Professional Experience" icon="bi bi-briefcase-fill" :showCreate="false"
       :showUpdate="true" :showDelete="false" @update="UpdateProfessional">
-      
+
       <div v-if="profileStore.user?.professional" class="professional-content">
         <div class="professional-item">
           <div class="item-icon">
