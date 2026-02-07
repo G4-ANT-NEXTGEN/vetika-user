@@ -67,7 +67,7 @@ export const useProfileStore = defineStore('profile', () => {
     }
   }
   const uploadCv = async (paylaod) => {
-    isLoading.value = true
+    isProcessing.value = true
     try {
       const formData = new FormData()
       formData.append('cv', paylaod)
@@ -83,7 +83,7 @@ export const useProfileStore = defineStore('profile', () => {
       showError('Only *.pdf file!')
       console.log(e)
     } finally {
-      isLoading.value = false
+      isProcessing.value = false
     }
   }
   const addCollaboration = async (payload) => {

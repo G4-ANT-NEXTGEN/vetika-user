@@ -85,7 +85,7 @@
       </p>
 
       <div class="hero-actions reveal-up">
-        <RouterLink to="/register" class="btn-get-started">Get started</RouterLink>
+        <RouterLink to="/createuser" class="btn-get-started">Get started</RouterLink>
       </div>
     </div>
   </div>

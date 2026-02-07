@@ -57,7 +57,7 @@
     </div>
 
     <!-- Image Section -->
-    <div class="post-media" v-if="post.image && post.image !== 'http://novia2.csm.linkpc.net/storage/posts'">
+    <div class="post-media" v-if="post.image && post.image !== 'https://novia2.csm.linkpc.net/storage/posts'">
       <div class="media-container" @click="showPreview = true">
         <img class="media-image" :src="post.image" alt="Post image" />
         <div class="media-overlay">
@@ -88,10 +88,6 @@
         </div>
         <span class="reaction-count">{{ likeCount }} reactions</span>
       </div>
-      <div class="comment-share-stats">
-        <span>32 comments</span>
-        <span>18 shares</span>
-      </div>
     </div>
 
     <!-- Footer Actions -->
@@ -101,11 +97,6 @@
           <i v-if="isLiked" class="bi bi-heart-fill"></i>
           <i v-else class="bi bi-heart"></i>
           <span class="action-label">Like</span>
-        </button>
-
-        <button class="action-btn">
-          <i class="bi bi-chat"></i>
-          <span class="action-label">Comment</span>
         </button>
 
         <div class="share-wrapper">
@@ -146,10 +137,6 @@
           </div>
         </div>
 
-        <button class="action-btn bookmark-btn">
-          <i class="bi bi-bookmark"></i>
-          <span class="action-label">Save</span>
-        </button>
       </div>
     </footer>
   </article>
@@ -186,7 +173,9 @@ const props = defineProps({
 defineEmits(['edit', 'delete', 'like', 'get-id', 'hide'])
 
 const formatDate = (date) => {
-  return moment.utc(date).local().fromNow()
+  if (!date) return ''
+  const m = moment.utc(date).local()
+  return m.format('hh:mm A')
 }
 
 const handleAvatarClick = () => {

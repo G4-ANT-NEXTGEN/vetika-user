@@ -5,13 +5,26 @@
       <p class="section-subtitle">Catch up on the latest updates and publications</p>
     </div>
 
+    <!-- Category Filter -->
+    <div class="category-filter-section mb-4">
+      <div class="pill-container">
+        <div :class="['category', { active: postStore.category === 0 }]" @click="updateCategory(0)">
+          All Posts
+        </div>
+        <div v-for="category in categoryStore.categories" :key="category.id"
+          :class="['category', { active: postStore.category == category.id }]" @click="updateCategory(category.id)">
+          {{ category.name }}
+        </div>
+      </div>
+    </div>
+
     <!-- Post Skeleton -->
     <template v-if="postStore.loading && postStore.posts.length === 0">
       <ArticleCardSkeleton v-for="n in 3" :key="n" />
     </template>
 
     <!-- No Data State -->
-    <NoData v-if="!postStore.loading && posts.length === 0" />
+    <NoData v-if="!postStore.loading && visiblePosts.length === 0" />
 
     <!-- ArticleCard list (only user's own posts) -->
     <ArticleCard v-for="post in visiblePosts" :key="post.id" :post="post" :currentUserId="authStore.user?.id"
@@ -130,8 +143,24 @@ const posts = computed(() => {
 })
 
 const visiblePosts = computed(() => {
-  return posts.value.filter((p) => !hiddenPosts.value.has(p.id))
+  let filtered = posts.value.filter((p) => !hiddenPosts.value.has(p.id))
+  const categoryId = postStore.category
+  if (categoryId !== 0) {
+    filtered = filtered.filter((p) => {
+      // Try category_ids array (IDs)
+      if (Array.isArray(p.category_ids) && p.category_ids.includes(categoryId)) return true
+      // Try categories array (Objects or IDs)
+      if (Array.isArray(p.categories) && p.categories.some(cat => (typeof cat === 'object' ? cat.id : cat) == categoryId)) return true
+      return false
+    })
+  }
+  return filtered
 })
+
+const updateCategory = async (categoryId) => {
+  postStore.category = categoryId
+  await postStore.fetchPosts()
+}
 
 authStore.fetchProfile()
 postStore.fetchPosts()
@@ -171,7 +200,7 @@ const openEditModal = async (postId) => {
     if (!post) return
 
     titlePost.value = post.text || ''
-    const isDefaultPath = post.image === 'http://novia2.csm.linkpc.net/storage/posts'
+    const isDefaultPath = post.image === 'https://novia2.csm.linkpc.net/storage/posts'
     file.value = isDefaultPath ? null : post.image || null
     imgPost.value = isDefaultPath ? null : post.image || null
     attachment.value = null
@@ -390,18 +419,32 @@ const closeModal = () => {
 }
 
 .category {
-  padding: 0.4rem 1rem;
-  background: var(--color-accent);
+  padding: 0.5rem 1.25rem;
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 50px;
-  font-size: 0.85rem;
+  font-size: 0.875rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.category:hover {
+  background: var(--color-accent);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  transform: translateY(-2px);
 }
 
 .category.active {
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-secondary);
   border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
 }
 
 .icon-post {

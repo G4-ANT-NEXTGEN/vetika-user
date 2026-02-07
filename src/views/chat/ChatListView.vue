@@ -31,7 +31,7 @@
             <div class="name-row">
               <span class="full-name">{{ chat.otherUser.full_name }}</span>
               <span class="time-stamp" v-if="chat.messages.length > 0">{{ formatLocalTime(chat.messages[0].created_at)
-              }}</span>
+                }}</span>
             </div>
             <div class="message-row">
               <p class="last-msg-text text-truncate">
@@ -53,18 +53,14 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useChatStore } from '@/stores/chat'
+import moment from 'moment-timezone'
 
 const chatStore = useChatStore()
 const isLoading = ref(false);
 
 const formatLocalTime = (time) => {
   if (!time) return '';
-  const date = new Date(time)
-  date.setHours(date.getHours() + 7)
-  return date.toLocaleTimeString([], {
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+  return moment.utc(time).local().format('hh:mm A');
 }
 
 onMounted(async () => {

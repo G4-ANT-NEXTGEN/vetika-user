@@ -22,8 +22,8 @@
               <i :class="theme === 'light' ? 'bi bi-moon-stars' : 'bi bi-sun'"></i>
             </button>
           </div>
-          <RouterLink to="/login" class="btn-login d-none d-sm-block">Sign In</RouterLink>
-          <RouterLink to="/register" class="btn-cta-nav">Try Free</RouterLink>
+          <RouterLink to="/login" class="btn-login">Login</RouterLink>
+          <RouterLink to="/createuser" class="btn-cta-nav">Register</RouterLink>
         </div>
       </div>
     </nav>
@@ -225,7 +225,7 @@
                 Discover how NextGen is empowering creators and communities worldwide.
                 Our users share their experiences on how collaboration became seamless and growth became inevitable.
               </p>
-              <RouterLink to="/register" class="btn-testimonial-more">
+              <RouterLink to="/createuser" class="btn-testimonial-more">
                 View More <i class="bi bi-arrow-right-short"></i>
               </RouterLink>
             </div>
@@ -264,7 +264,7 @@
             <h2>Ready to join the <span>NextGen?</span></h2>
             <p>Experience the community platform that adapts to your needs. Join today for free.</p>
             <div class="cta-btns">
-              <RouterLink to="/register" class="btn-primary-gradient lg rounded-pill text-decoration-none">Get Started
+              <RouterLink to="/createuser" class="btn-primary-gradient lg rounded-pill text-decoration-none">Get Started
                 Now</RouterLink>
             </div>
           </div>
@@ -374,16 +374,6 @@ const mainFeatures = [
       'Profiles (photo, bio, interests)',
       'Edit profile & verification',
       'Admin, moderator, member roles'
-    ]
-  },
-  {
-    icon: 'bi-collection-play-fill',
-    title: 'Media & Content',
-    items: [
-      'Image & Gallery uploads',
-      'Professional Video embeds',
-      'Secure File attachments',
-      'Smart content previews'
     ]
   },
   {

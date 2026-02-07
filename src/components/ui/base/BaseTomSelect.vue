@@ -28,11 +28,21 @@ onMounted(() => {
     placeholder: props.placeholder || 'Select...',
     items: props.modelValue ? [].concat(props.modelValue) : [],
     closeAfterSelect: !props.multiple,
+    plugins: props.multiple ? ['remove_button'] : [],
     onChange(value) {
       emit('update:modelValue', props.multiple ? value : value[0])
     },
   })
 })
+
+const updateOptions = () => {
+  if (!tom) return
+  tom.clearOptions()
+  tom.addOptions(props.options)
+  tom.refreshOptions(false)
+}
+
+watch(() => props.options, updateOptions, { deep: true })
 
 watch(
   () => props.modelValue,
@@ -45,93 +55,174 @@ onBeforeUnmount(() => tom?.destroy())
 </script>
 
 <style>
-/* wrapper */
+/* Main Wrapper */
 .ts-wrapper {
   width: 100%;
 }
 
-/* input area */
+/* Control Input Area */
 .ts-control {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  min-height: 48px;
-  padding: 6px 10px;
-  box-shadow: none;
-  color: var(--color-text);
+  background: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 14px !important;
+  min-height: 52px !important;
+  padding: 8px 12px !important;
+  box-shadow: var(--shadow-sm) !important;
+  color: var(--color-text) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
 }
 
-/* focus */
-.ts-control.focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.06);
+/* Focus State */
+.ts-wrapper.focus .ts-control {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.1) !important;
+  background: var(--color-surface) !important;
 }
 
-[data-theme='dark'] .ts-control.focus {
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.04);
+/* Input Styles */
+.ts-control input {
+  font-size: 0.95rem !important;
+  color: var(--color-text) !important;
+  padding: 4px 0 !important;
 }
 
-/* placeholder */
 .ts-control input::placeholder {
-  color: var(--color-text-tertiary);
-  font-size: 0.9rem;
+  color: var(--color-muted) !important;
+  opacity: 0.7 !important;
 }
 
-/* selected tag */
+/* Selected Items (Tags/Pills) */
 .ts-control .item {
-  background: var(--color-hover);
-  color: var(--color-text);
-  border-radius: 10px;
-  padding: 10px;
-  font-size: 0.85rem;
-  border: 1px solid var(--color-border);
+  background: var(--color-accent) !important;
+  color: var(--color-text) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 10px !important;
+  padding: 4px 10px !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  transition: all 0.2s ease !important;
+  margin: 0 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02) !important;
 }
 
-/* remove button */
-.ts-control .remove {
-  color: var(--color-muted);
-  font-size: 14px;
+.ts-control .item:hover {
+  background: var(--color-border) !important;
+  transform: translateY(-1px) !important;
 }
 
-/* dropdown */
+/* Remove button on tags */
+.ts-control .item .remove {
+  border: none !important;
+  margin-left: 4px !important;
+  border-radius: 4px !important;
+  padding: 0 4px !important;
+  font-size: 1.1rem !important;
+  line-height: 1 !important;
+  color: var(--color-muted) !important;
+  opacity: 0.6 !important;
+  transition: all 0.2s ease !important;
+}
+
+.ts-control .item .remove:hover {
+  background: rgba(239, 68, 68, 0.1) !important;
+  color: #ef4444 !important;
+  opacity: 1 !important;
+}
+
+/* Dropdown Container */
 .ts-dropdown {
-  margin-top: 6px;
-  border-radius: 12px;
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-md);
-  color: var(--color-text);
+  margin-top: 8px !important;
+  border-radius: 16px !important;
+  border: 1px solid var(--color-border) !important;
+  background: var(--color-surface) !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+  overflow: hidden !important;
+  z-index: 1000 !important;
+  animation: slideDown 0.2s ease-out !important;
 }
 
-/* dropdown items */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dropdown Content */
+.ts-dropdown-content {
+  padding: 6px !important;
+  max-height: 250px !important;
+}
+
+/* Options */
 .ts-dropdown .option {
-  padding: 12px 14px;
-  font-size: 0.9rem;
-  color: var(--color-text);
+  padding: 10px 14px !important;
+  border-radius: 10px !important;
+  font-size: 0.925rem !important;
+  font-weight: 500 !important;
+  color: var(--color-text-secondary) !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  margin-bottom: 2px !important;
 }
 
-/* hover */
+.ts-dropdown .option:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Option States */
 .ts-dropdown .option.active {
-  background: var(--color-hover);
+  background: var(--color-accent) !important;
+  color: var(--color-primary) !important;
 }
 
-/* selected */
 .ts-dropdown .option.selected {
-  background: var(--bg-tag);
-  font-weight: 500;
+  background: rgba(var(--color-primary-rgb), 0.05) !important;
+  color: var(--color-primary) !important;
+  font-weight: 700 !important;
 }
 
-/* scrollbar */
+/* Scrollbar Styling */
 .ts-dropdown-content::-webkit-scrollbar {
-  width: 6px;
+  width: 5px !important;
+}
+
+.ts-dropdown-content::-webkit-scrollbar-track {
+  background: transparent !important;
 }
 
 .ts-dropdown-content::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 10px;
+  background: var(--color-border) !important;
+  border-radius: 10px !important;
 }
 
-.ts-wrapper.multi .ts-control > div {
-  padding: 6px !important;
+/* Select Arrow */
+.ts-wrapper .ts-control::after {
+  content: '\F282' !important;
+  font-family: 'bootstrap-icons' !important;
+  border: none !important;
+  width: auto !important;
+  height: auto !important;
+  top: 50% !important;
+  right: 15px !important;
+  transform: translateY(-50%) !important;
+  color: var(--color-muted) !important;
+  font-size: 0.9rem !important;
+  transition: transform 0.3s ease !important;
+}
+
+.ts-wrapper.dropdown-active .ts-control::after {
+  transform: translateY(-50%) rotate(180deg) !important;
 }
 </style>

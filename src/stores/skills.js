@@ -59,9 +59,10 @@ export const useSkillStore = defineStore("skill", () => {
       isProcessing.value = false;
     }
   };
-  const updateSkills = async(payload) => {
-    try{
-      isProcessing.value=true
+
+  const updateSkills = async (payload) => {
+    try {
+      isProcessing.value = true
       const params = new URLSearchParams();
       params.append('skill_ids', JSON.stringify(payload))
       const res = await api.put("/api/profile/skills", params, {
@@ -74,12 +75,12 @@ export const useSkillStore = defineStore("skill", () => {
       fetchSkills()
       return res
     }
-    catch(e){
+    catch (e) {
       console.log(e)
       showError('Faild to update skill')
     }
-    finally{
-      isProcessing.value=true
+    finally {
+      isProcessing.value = false
     }
   }
   const deleteSkill = async (id) => {

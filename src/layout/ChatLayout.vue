@@ -40,7 +40,6 @@ console.log('chatStore in layout : ', chatStore.isSelectChat)
   border-radius: 20px;
   display: flex;
   overflow: hidden;
-  box-shadow: var(--shadow-lg);
 }
 
 .chat-sidebar {

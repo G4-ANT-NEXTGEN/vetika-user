@@ -52,7 +52,7 @@ export const useAuthStore = defineStore('auth', () => {
     } finally {
       token.value = null
       localStorage.removeItem('token')
-      router.push('/login')
+      router.push({ name: 'landing' })
     }
   }
 
