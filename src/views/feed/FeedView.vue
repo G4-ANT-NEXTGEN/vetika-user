@@ -21,19 +21,19 @@
               </div>
               <div class="action-info">
                 <span class="action-title">Photo</span>
-                <span class="action-desc">Share an image</span>
+                <span class="action-desc d-none d-sm-block">Share an image</span>
               </div>
             </button>
 
             <div class="vertical-divider d-none d-sm-block"></div>
 
             <button class="action-btn-premium" @click="openCreatePostModal">
-              <div class="icon-wrap attach-bg">
+              <div class="icon-wrap attach-bg ">
                 <i class="bi bi-paperclip"></i>
               </div>
-              <div class="action-info">
+              <div class="action-info ">
                 <span class="action-title">Attachment</span>
-                <span class="action-desc">Share documents or files</span>
+                <span class="action-desc d-none d-sm-block">Share documents or files</span>
               </div>
             </button>
           </div>

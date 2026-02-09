@@ -1,50 +1,48 @@
 <template>
-
-    <!-- Step 1: Create Account -->
-    <button class="back-button" @click="router.go(-1)">
-        <div class="icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M15 18l-6-6 6-6" />
-            </svg>
-        </div>
-        Back
-    </button>
-
-    <div class="step-indicator">STEP 2 OF 4</div>
-    <h1>User Type</h1>
-    <p class="description">Select your user type</p>
-
-    <h3 class="section-title">Choose Your User Type</h3>
+  <div class="form-section">
+    <div class="header-section">
+      <button class="back-button" @click="router.go(-1)">
+        <i class="bi bi-arrow-left"></i>
+        <span>Previous Step</span>
+      </button>
+      <div class="step-chip">STEP 2 OF 4</div>
+      <h1 class="form-title">Account Type</h1>
+      <p class="form-description">Select the category that best describes your needs.</p>
+    </div>
 
     <div class="user-type-grid">
-        <div class="user-type-option" v-for="userType in usersTypes" :key="userType.id">
-            <input type="radio" name="userType" :id="userType.id" :value="userType.id" v-model="selectedUserTypeId" />
-            <label :for="userType.id" class="user-type-card">
-                <div class="user-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                </div>
-                <span class="user-type-label">{{ userType.name }}</span>
-            </label>
-        </div>
+      <div v-for="userType in usersTypes" :key="userType.id" class="user-type-option">
+        <input type="radio" name="userType" :id="'type-' + userType.id" :value="userType.id"
+          v-model="selectedUserTypeId" class="type-radio" />
+        <label :for="'type-' + userType.id" class="type-card">
+          <div class="type-icon-wrapper">
+            <i :class="userType.icon"></i>
+          </div>
+          <div class="type-content">
+            <div class="type-label">{{ userType.name }}</div>
+            <div class="type-desc">{{ userType.description }}</div>
+          </div>
+          <div class="selected-indicator">
+            <i class="bi bi-check-circle-fill"></i>
+          </div>
+        </label>
+      </div>
     </div>
 
-    <div class="d-flex justify-content-end mt-0">
-        <div class="button-group">
-            <BaseButton type="button" variant="primary" @click="nextStep()" :isLoading="isLoading">
-                Continue
-            </BaseButton>
-        </div>
+    <div class="form-footer">
+      <BaseButton variant="primary" size="lg" class="submit-btn" :isLoading="isLoading" :disabled="!selectedUserTypeId"
+        @click="nextStep">
+        <span>Continue</span>
+        <i class="bi bi-chevron-right ms-2"></i>
+      </BaseButton>
     </div>
-
+  </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { showSuccess, showError } from "@/utils/toast";
+import { showError } from "@/utils/toast";
 import BaseButton from "@/components/ui/base/BaseButton.vue"
 import { useAuthStore } from '@/stores/auth';
 
@@ -54,212 +52,211 @@ const authStore = useAuthStore()
 const selectedUserTypeId = ref(null)
 
 const usersTypes = ref([
-    {
-        id: 1,
-        name: 'Freelancer',
-    },
-    {
-        id: 2,
-        name: 'Student',
-    },
-    {
-        id: 3,
-        name: 'Investor',
-    },
-    {
-        id: 4,
-        name: 'Interpreter',
-    },
-    {
-        id: 5,
-        name: 'Other',
-    },
+  { id: 1, name: 'Freelancer', description: 'Work independently on projects', icon: 'bi bi-laptop' },
+  { id: 2, name: 'Student', description: 'Learning and building portfolio', icon: 'bi bi-book' },
+  { id: 3, name: 'Investor', description: 'Looking for great opportunities', icon: 'bi bi-graph-up-arrow' },
+  { id: 4, name: 'Interpreter', description: 'Language and communication expert', icon: 'bi bi-translate' },
+  { id: 5, name: 'Client', description: 'Hiring talent for projects', icon: 'bi bi-briefcase' },
 ])
 
 const nextStep = async () => {
-    try {
-        isLoading.value = true
+  if (!selectedUserTypeId.value) return
 
-        const payload = {
-            user_type_ids: JSON.stringify([selectedUserTypeId.value])
-        }
-
-        await authStore.userType(payload)
-
-        router.push({ name: 'positionuser' })
-    } catch (error) {
-        showError('Failed to select user type')
-    } finally {
-        isLoading.value = false
+  try {
+    isLoading.value = true
+    const payload = {
+      user_type_ids: JSON.stringify([selectedUserTypeId.value])
     }
+    await authStore.userType(payload)
+    router.push({ name: 'positionuser' })
+  } catch (error) {
+    showError('Failed to select user type')
+  } finally {
+    isLoading.value = false
+  }
 }
-
 </script>
 
-
 <style scoped>
-.step-indicator {
-    color: rgb(0, 106, 255);
-    font-size: 12px;
-    margin-bottom: 12px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
+.form-section {
+  animation: slideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-h1 {
-    font-size: 32px;
-    color: var(--color-text);
-    margin-bottom: 10px;
-    font-weight: 700;
-    line-height: 1.2;
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.description {
-    color: var(--color-gray);
-    font-size: 14px;
-    margin-bottom: 40px;
-    line-height: 1.5;
-}
-
-.button-group {
-    width: 200px;
+.header-section {
+  margin-bottom: 40px;
 }
 
 .back-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: none;
-    border: none;
-    color: #374151;
-    font-size: 0.875rem;
-    cursor: pointer;
-    margin-bottom: 2rem;
-    padding: 0.5rem;
-    transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 0;
+  margin-bottom: 24px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .back-button:hover {
-    color: #000;
+  color: var(--color-primary);
+  transform: translateX(-4px);
 }
 
-.back-button .icon {
-    background: #e5e7eb;
-    border-radius: 50%;
-    padding: 0.25rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #6b7280;
+.step-chip {
+  display: inline-block;
+  padding: 4px 12px;
+  background: rgba(var(--color-primary-rgb), 0.08);
+  color: var(--color-primary);
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+  text-transform: uppercase;
 }
 
-.page-title {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #111827;
-    margin-bottom: 0.5rem;
+.form-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
 }
 
-.page-subtitle {
-    color: #6b7280;
-    margin-bottom: 2rem;
+.form-description {
+  color: var(--color-text-tertiary);
+  font-size: 15px;
+  line-height: 1.6;
 }
 
-.section-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #111827;
-    margin-bottom: 1.5rem;
-}
-
-/* User Type Grid */
 .user-type-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    margin-bottom: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 10px;
 }
 
 .user-type-option {
-    position: relative;
+  position: relative;
 }
 
-.user-type-option input[type="radio"] {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
+.type-radio {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
 }
 
-.user-type-card {
-    background: white;
-    border: 2px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 2rem 1.5rem;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
+.type-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px;
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  height: 100%;
 }
 
-.user-type-option input[type="radio"]:checked+.user-type-card {
-    border-color: #000;
-    background: #f9fafb;
+.type-card:hover {
+  border-color: var(--color-primary);
+  background: rgba(var(--color-primary-rgb), 0.02);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
-.user-type-card:hover {
-    border-color: #9ca3af;
+.type-radio:checked+.type-card {
+  border-color: var(--color-primary);
+  background: rgba(var(--color-primary-rgb), 0.04);
+  box-shadow: 0 0 0 1px var(--color-primary);
 }
 
-.user-icon {
-    width: 48px;
-    height: 48px;
-    background: #f3f4f6;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #6b7280;
+.type-icon-wrapper {
+  width: 56px;
+  height: 56px;
+  background: rgba(var(--color-primary-rgb), 0.05);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: var(--color-primary);
+  transition: all 0.3s ease;
 }
 
-.user-type-option input[type="radio"]:checked+.user-type-card .user-icon {
-    background: #e5e7eb;
-    color: #111827;
+.type-radio:checked+.type-card .type-icon-wrapper {
+  background: var(--color-primary);
+  color: var(--color-surface);
+  transform: scale(1.1);
 }
 
-.user-type-label {
-    font-size: 0.9375rem;
-    color: #111827;
-    font-weight: 500;
+.type-content {
+  flex: 1;
 }
 
-/* Continue Button */
-.button-container {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 3rem;
+.type-label {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--color-text);
+  margin-bottom: 4px;
 }
 
-.continue-button {
-    background: #000;
-    color: white;
-    border: none;
-    padding: 0.875rem 2rem;
-    border-radius: 8px;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
+.type-desc {
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+  line-height: 1.4;
 }
 
-.continue-button:hover {
-    background: #1f2937;
+.selected-indicator {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  color: var(--color-primary);
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.continue-button:disabled {
-    background: #9ca3af;
-    cursor: not-allowed;
+.type-radio:checked+.type-card .selected-indicator {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.form-footer {
+  margin-top: 48px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.submit-btn {
+  min-width: 160px;
+  border-radius: 14px;
+  height: 54px;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .user-type-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

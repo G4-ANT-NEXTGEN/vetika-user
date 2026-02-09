@@ -1,51 +1,47 @@
 <template>
-
-    <!-- Step 1: Create Account -->
-    <button class="back-button" @click="router.go(-1)">
-        <div class="icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M15 18l-6-6 6-6" />
-            </svg>
+    <div class="form-section">
+        <div class="header-section">
+            <button class="back-button" @click="router.go(-1)">
+                <i class="bi bi-arrow-left"></i>
+                <span>Previous Step</span>
+            </button>
+            <div class="step-chip">STEP 3 OF 4</div>
+            <h1 class="form-title">Your Position</h1>
+            <p class="form-description">Select your main area of expertise or interest.</p>
         </div>
-        Back
-    </button>
 
-    <div class="step-indicator">STEP 3 OF 4</div>
-    <h1>User Position</h1>
-    <p class="description">Select your user position</p>
-
-    <h3 class="section-title">Choose Your User Position</h3>
-
-    <div class="user-type-grid">
-        <div class="user-type-option" v-for="userType in usersTypes" :key="userType.id">
-            <input type="radio" name="userType" :id="userType.id" :value="userType.id"
-                v-model="selectedUserPositionId" />
-            <label :for="userType.id" class="user-type-card">
-                <div class="user-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                    </svg>
-                </div>
-                <span class="user-type-label">{{ userType.name }}</span>
-            </label>
+        <div class="position-grid">
+            <div v-for="pos in usersTypes" :key="pos.id" class="position-option">
+                <input type="radio" name="userPosition" :id="'pos-' + pos.id" :value="pos.id"
+                    v-model="selectedUserPositionId" class="pos-radio" />
+                <label :for="'pos-' + pos.id" class="pos-card">
+                    <div class="pos-icon-wrapper">
+                        <i :class="pos.icon"></i>
+                    </div>
+                    <div class="pos-content">
+                        <div class="pos-label">{{ pos.name }}</div>
+                    </div>
+                    <div class="selected-indicator">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </div>
+                </label>
+            </div>
         </div>
-    </div>
 
-    <div class="d-flex justify-content-end mt-0">
-        <div class="button-group">
-            <BaseButton type="button" variant="primary" @click="nextStep()" :isLoading="isLoading">
-                Continue
+        <div class="form-footer">
+            <BaseButton variant="primary" size="lg" class="submit-btn" :isLoading="isLoading"
+                :disabled="!selectedUserPositionId" @click="nextStep">
+                <span>Continue</span>
+                <i class="bi bi-chevron-right ms-2"></i>
             </BaseButton>
         </div>
     </div>
-
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { showSuccess, showError } from "@/utils/toast";
+import { showError } from "@/utils/toast";
 import BaseButton from "@/components/ui/base/BaseButton.vue"
 import { useAuthStore } from '@/stores/auth';
 
@@ -53,46 +49,27 @@ const isLoading = ref(false)
 const router = useRouter()
 const authStore = useAuthStore()
 const selectedUserPositionId = ref(null)
+
 const usersTypes = ref([
-    {
-        id: 1,
-        name: 'Font End',
-    },
-    {
-        id: 2,
-        name: 'Back End',
-    },
-    {
-        id: 3,
-        name: 'Mobile App',
-    },
-    {
-        id: 4,
-        name: 'UX/UI Design',
-    },
-    {
-        id: 5,
-        name: 'Data Science',
-    },
-    {
-        id: 6,
-        name: 'DevOps',
-    },
+    { id: 1, name: 'Front End', icon: 'bi bi-window-sidebar' },
+    { id: 2, name: 'Back End', icon: 'bi bi-database' },
+    { id: 3, name: 'Mobile App', icon: 'bi bi-phone' },
+    { id: 4, name: 'UX/UI Design', icon: 'bi bi-bezier2' },
+    { id: 5, name: 'Data Science', icon: 'bi bi-cpu' },
+    { id: 6, name: 'DevOps', icon: 'bi bi-infinity' },
 ])
 
 const nextStep = async () => {
+    if (!selectedUserPositionId.value) return
+
     try {
         isLoading.value = true
-
         const payload = {
             position_ids: JSON.stringify([selectedUserPositionId.value])
         }
-
         await authStore.userPosition(payload)
-
-        router.push({ name: 'previewuser' })    
-
-    } catch (error) {
+        router.push({ name: 'previewuser' })
+    } catch {
         showError('Failed to select user position')
     } finally {
         isLoading.value = false
@@ -100,170 +77,175 @@ const nextStep = async () => {
 }
 </script>
 
-
 <style scoped>
-.step-indicator {
-    color: rgb(0, 106, 255);
-    font-size: 12px;
-    margin-bottom: 12px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
+.form-section {
+    animation: slideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-h1 {
-    font-size: 32px;
-    color: var(--color-text);
-    margin-bottom: 10px;
-    font-weight: 700;
-    line-height: 1.2;
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-.description {
-    color: var(--color-gray);
-    font-size: 14px;
+.header-section {
     margin-bottom: 40px;
-    line-height: 1.5;
-}
-
-.button-group {
-    width: 200px;
 }
 
 .back-button {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 8px;
     background: none;
     border: none;
-    color: #374151;
-    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 0;
+    margin-bottom: 24px;
     cursor: pointer;
-    margin-bottom: 2rem;
-    padding: 0.5rem;
-    transition: color 0.2s;
+    transition: all 0.2s ease;
 }
 
 .back-button:hover {
-    color: #000;
+    color: var(--color-primary);
+    transform: translateX(-4px);
 }
 
-.back-button .icon {
-    background: #e5e7eb;
-    border-radius: 50%;
-    padding: 0.25rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #6b7280;
+.step-chip {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(var(--color-primary-rgb), 0.08);
+    color: var(--color-primary);
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
 }
 
-.page-title {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #111827;
-    margin-bottom: 0.5rem;
+.form-title {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--color-text);
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
 }
 
-.page-subtitle {
-    color: #6b7280;
-    margin-bottom: 2rem;
+.form-description {
+    color: var(--color-text-tertiary);
+    font-size: 15px;
+    line-height: 1.6;
 }
 
-.section-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: #111827;
-    margin-bottom: 1.5rem;
-}
-
-/* User Type Grid */
-.user-type-grid {
+.position-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    margin-bottom: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 10px;
 }
 
-.user-type-option {
+.position-option {
     position: relative;
 }
 
-.user-type-option input[type="radio"] {
+.pos-radio {
     position: absolute;
     opacity: 0;
-    cursor: pointer;
+    width: 0;
+    height: 0;
 }
 
-.user-type-card {
-    background: white;
-    border: 2px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 2rem 1.5rem;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
+.pos-card {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.75rem;
+    gap: 16px;
+    padding: 32px 20px;
+    background: var(--color-surface);
+    border: 1.5px solid var(--color-border);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    text-align: center;
 }
 
-.user-type-option input[type="radio"]:checked+.user-type-card {
-    border-color: #000;
-    background: #f9fafb;
+.pos-card:hover {
+    border-color: var(--color-primary);
+    background: rgba(var(--color-primary-rgb), 0.02);
+    transform: translateY(-2px);
 }
 
-.user-type-card:hover {
-    border-color: #9ca3af;
+.pos-radio:checked+.pos-card {
+    border-color: var(--color-primary);
+    background: rgba(var(--color-primary-rgb), 0.04);
+    box-shadow: 0 0 0 1px var(--color-primary);
 }
 
-.user-icon {
-    width: 48px;
-    height: 48px;
-    background: #f3f4f6;
+.pos-icon-wrapper {
+    width: 60px;
+    height: 60px;
+    background: rgba(var(--color-primary-rgb), 0.05);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #6b7280;
+    font-size: 24px;
+    color: var(--color-primary);
+    transition: all 0.3s ease;
 }
 
-.user-type-option input[type="radio"]:checked+.user-type-card .user-icon {
-    background: #e5e7eb;
-    color: #111827;
+.pos-radio:checked+.pos-card .pos-icon-wrapper {
+    background: var(--color-primary);
+    color: var(--color-surface);
+    transform: scale(1.1);
 }
 
-.user-type-label {
-    font-size: 0.9375rem;
-    color: #111827;
-    font-weight: 500;
+.pos-label {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--color-text);
 }
 
-/* Continue Button */
-.button-container {
+.selected-indicator {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    color: var(--color-primary);
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.pos-radio:checked+.pos-card .selected-indicator {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.form-footer {
+    margin-top: 48px;
     display: flex;
     justify-content: flex-end;
-    margin-top: 3rem;
 }
 
-.continue-button {
-    background: #000;
-    color: white;
-    border: none;
-    padding: 0.875rem 2rem;
-    border-radius: 8px;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
+.submit-btn {
+    min-width: 160px;
+    border-radius: 14px;
+    height: 54px;
+    font-weight: 700;
 }
 
-.continue-button:hover {
-    background: #1f2937;
-}
-
-.continue-button:disabled {
-    background: #9ca3af;
-    cursor: not-allowed;
+@media (max-width: 576px) {
+    .position-grid {
+        grid-template-columns: 1fr;
+    }
 }
 </style>

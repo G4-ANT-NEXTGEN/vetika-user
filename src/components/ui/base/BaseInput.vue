@@ -43,7 +43,7 @@ defineEmits(['update:modelValue', 'blur'])
 }
 
 .form-control {
-  padding: 16px 18px;
+  padding: 12px 16px;
   border: 1px solid var(--input-border);
   border-radius: 12px;
   font-size: 15px;
