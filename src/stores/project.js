@@ -7,11 +7,11 @@ export const useProjectStore = defineStore("project", () => {
   const CreateProject = async (payload) => {
     try {
       const responce = await api.post("/api/projects", payload);
-      showSuccess("Project created successfully");
+      showSuccess(responce.data.message);
       return responce.data;
     } catch (err) {
       console.log("Create Project Error:", err);
-      showError("Failed to create project");
+      showError(err.response?.data?.message || 'Failed to create project');
       throw err;
     }
   };
@@ -19,10 +19,10 @@ export const useProjectStore = defineStore("project", () => {
   const UpdateProject = async (id, payload) => {
     try {
         const responce = await api.put(`/api/projects/${id}`, payload);
-        showSuccess("Project updated successfully");
+        showSuccess(responce.data.message);
         return responce.data;
     } catch (err) {
-        showError("Failed to Update project");
+        showError(err.response?.data?.message || 'Failed to update project');
         throw err;
     }
   }
@@ -30,10 +30,10 @@ export const useProjectStore = defineStore("project", () => {
   const DeleteProject = async (id) => {
     try {
         const responce = await api.delete(`/api/projects/${id}`);
-        showSuccess("Project deleted successfully");
+        showSuccess(responce.data.message);
         return responce.data;
     } catch (err) {
-        showError("Failed to delete project");
+        showError(err.response?.data?.message || 'Failed to delete project');
         throw err;
     }
   }

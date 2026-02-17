@@ -115,7 +115,7 @@
 
         <div class="mb-0">
           <label class="form-label d-block mb-2 fw-bold small text-uppercase light-dark">Description</label>
-          <textarea class="form-control light-dark"
+          <textarea class="form-control light-dark "
             placeholder="Describe your achievements, participation or relevant courses..." rows="5"
             v-model="description"></textarea>
         </div>
@@ -327,6 +327,10 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+
+textarea::placeholder {
+  color: var(--color-primary);
+}
 .education-list {
   display: flex;
   flex-direction: column;
