@@ -103,8 +103,8 @@
         <div class="delete-warning-icon mb-3">
           <i class="bi bi-exclamation-triangle-fill"></i>
         </div>
-        <h4>Are you sure?</h4>
-        <p class="text-muted">
+        <h4 class="light-dark">Are you sure?</h4>
+        <p class="light-dark">
           You are about to delete <strong>{{ selectedProjectForDelete?.title }}</strong>.
           This action cannot be undone.
         </p>
@@ -376,7 +376,7 @@ onMounted(async () => {
 
 .action-btn-circle:hover {
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-background);
   border-color: var(--color-primary);
 }
 

@@ -86,11 +86,16 @@ export const usePostStore = defineStore('post', () => {
           'Content-Type': 'multipart/form-data'
         }
       })
-      showSuccess('Post created successfully')
+      showSuccess(response.data.message)
       return response.data.data
     } catch (err) {
       console.log(err.response?.data)
-      showError('Failed to create post')
+      const errorData = err.response?.data
+      if (errorData?.data && typeof errorData.data === 'object' && !Array.isArray(errorData.data)) {
+        Object.values(errorData.data).flat().forEach(msg => showError(msg))
+      } else {
+        showError(errorData?.message || 'Failed to create post')
+      }
     }
   }
 
@@ -105,22 +110,27 @@ export const usePostStore = defineStore('post', () => {
         }
       }
       const response = await api.post(`/api/posts/${id}`, payload, config)
-      showSuccess('Post updated successfully')
+      showSuccess(response.data.message)
       return response.data.data
     } catch (err) {
       console.log(err.response?.data)
-      showError('Failed to update post')
+      const errorData = err.response?.data
+      if (errorData?.data && typeof errorData.data === 'object' && !Array.isArray(errorData.data)) {
+        Object.values(errorData.data).flat().forEach(msg => showError(msg))
+      } else {
+        showError(errorData?.message || 'Failed to update post')
+      }
     }
   }
 
   const deletePost = async (id) => {
     try {
-      await api.delete(`/api/posts/${id}`)
-      showSuccess('Post deleted successfully')
+      const response = await api.delete(`/api/posts/${id}`)
+      showSuccess(response.data.message)
       await fetchPosts()
     } catch (err) {
       console.log(err.response?.data);
-      showError('Failed to delete post');
+      showError(err.response?.data?.message || 'Failed to delete post');
     }
   }
 
