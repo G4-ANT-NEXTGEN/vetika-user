@@ -5,7 +5,7 @@
     <div class="header-main">
       <div class="cover-area">
         <div v-if="!profileStore.user?.cover" class="cover-grid"></div>
-        <img v-else-if="profileStore.user?.cover" :src="profileStore.user?.cover" alt="Profile Cover"
+        <img v-else-if="profileStore.user?.cover" :src="bustCache(profileStore.user?.cover)" alt="Profile Cover"
           class="cover-image" />
         <div class="cover-overlay"></div>
 
@@ -21,9 +21,9 @@
           <!-- Avatar - Overlapping Cover -->
           <div class="avatar-box">
             <div class="avatar-ring">
-              <img :src="profileStore.user?.avatar" alt="Profile Avatar" class="profile-avatar" />
+              <img :src="bustCache(profileStore.user?.avatar)" alt="Profile Avatar" class="profile-avatar" />
             </div>
-            <button class="avatar-edit-trigger" @click="showImageCropper = true">
+            <button class="avatar-edit-trigger" @click="openEditAvatar">
               <i class="bi bi-camera-fill"></i>
             </button>
           </div>
@@ -240,15 +240,23 @@
       <BaseModal v-if="editCover" title="Update Cover Photo" size="lg" @close="closeEditCover">
         <div class="modal-content-wrapper">
           <div class="cropper-container">
+            <!-- Show cropper only when user picked a new local file -->
             <Cropper v-if="uploadedImage" ref="cropperCoverRef" :src="uploadedImage"
               :stencil-props="{ aspectRatio: null, resizable: true, movable: true }" />
+            <!-- Show current cover preview when no new file selected yet -->
             <div v-else class="upload-placeholder">
-              <div class="placeholder-icon">
-                <i class="bi bi-image"></i>
+              <div v-if="profileStore.user?.cover" class="current-cover-preview">
+                <img :src="bustCache(profileStore.user.cover)" alt="Current Cover" class="current-cover-img" />
+                <span class="sub-msg mt-2">Click "Choose Image" to select a new cover</span>
               </div>
-              <div class="placeholder-text">
-                <span class="main-msg">Select an image to crop</span>
-                <span class="sub-msg">PNG, JPG or GIF up to 3MB</span>
+              <div v-else class="placeholder-icon-wrap">
+                <div class="placeholder-icon">
+                  <i class="bi bi-image"></i>
+                </div>
+                <div class="placeholder-text">
+                  <span class="main-msg">Select an image to crop</span>
+                  <span class="sub-msg">PNG, JPG or GIF up to 3MB</span>
+                </div>
               </div>
             </div>
           </div>
@@ -271,7 +279,8 @@
         <template #footer>
           <BaseButton @click="closeEditCover" variant="secondary">Cancel
           </BaseButton>
-          <BaseButton @click="applyChageCover" :isLoading="profileStore.isProcessing" variant="primary">
+          <BaseButton @click="applyChageCover" :isLoading="profileStore.isProcessing" variant="primary"
+            :disabled="!uploadedImage">
             <span>
               {{ profileStore.isProcessing ? 'Saving ...' : 'Save Changes' }}
             </span>
@@ -283,15 +292,23 @@
       <BaseModal v-if="showImageCropper" title="Update Profile Photo" @close="closeEditAvatar">
         <div class="modal-content-wrapper">
           <div class="cropper-container circle">
+            <!-- Show cropper only when user picked a new local file -->
             <Cropper v-if="uploadedImage" ref="cropperRef" :src="uploadedImage" :stencil-props="{ aspectRatio: 1 }"
               :stencil-component="CircleStencil" />
+            <!-- Show current avatar preview when no new file selected yet -->
             <div v-else class="upload-placeholder">
-              <div class="placeholder-icon">
-                <i class="bi bi-person-circle"></i>
+              <div v-if="profileStore.user?.avatar" class="current-avatar-preview">
+                <img :src="bustCache(profileStore.user.avatar)" alt="Current Avatar" class="current-avatar-img" />
+                <span class="sub-msg mt-2">Click "Choose Photo" to select a new photo</span>
               </div>
-              <div class="placeholder-text">
-                <span class="main-msg">Select a photo to crop</span>
-                <span class="sub-msg">PNG or JPG up to 3MB</span>
+              <div v-else class="placeholder-icon-wrap">
+                <div class="placeholder-icon">
+                  <i class="bi bi-person-circle"></i>
+                </div>
+                <div class="placeholder-text">
+                  <span class="main-msg">Select a photo to crop</span>
+                  <span class="sub-msg">PNG or JPG up to 3MB</span>
+                </div>
               </div>
             </div>
           </div>
@@ -314,7 +331,8 @@
           <BaseButton @click="closeEditAvatar" variant="secondary">
             Cancel
           </BaseButton>
-          <BaseButton @click="applyCrop" variant="primary" :isLoading="profileStore.isProcessing">
+          <BaseButton @click="applyCrop" variant="primary" :isLoading="profileStore.isProcessing"
+            :disabled="!uploadedImage">
             <span>{{ profileStore.isProcessing ? 'Saving...' : 'Save Changes' }}</span>
           </BaseButton>
         </template>
@@ -366,7 +384,7 @@ import { onMounted, ref } from 'vue'
 import { useProfileStore } from '@/stores/profile'
 import { usePostStore } from '@/stores/post'
 import { useAuthStore } from '@/stores/auth'
-import { Cropper } from 'vue-advanced-cropper'
+import { Cropper, CircleStencil } from 'vue-advanced-cropper'
 import ProfileHeaderSkeleton from '@/components/profile/ProfileHeaderSkeleton.vue'
 import 'vue-advanced-cropper/dist/style.css'
 import BaseButton from '../ui/base/BaseButton.vue'
@@ -401,6 +419,12 @@ const tabs = [
 ]
 
 const authStore = useAuthStore()
+const imgCacheBust = ref(Date.now())
+
+const bustCache = (url) => {
+  if (!url) return url
+  return `${url}?t=${imgCacheBust.value}`
+}
 const cropperRef = ref()
 const cropperCoverRef = ref(null)
 const showImageCropper = ref(false)
@@ -589,6 +613,7 @@ const applyCrop = async () => {
   const canvas = cropperRef.value.getResult().canvas
   const avatar = canvas.toDataURL('image/jpeg', 0.9)
   await profileStore.uploadAvatarBase64(avatar)
+  imgCacheBust.value = Date.now()
   showImageCropper.value = false
   uploadedImage.value = null
   await postStore.fetchPosts()
@@ -602,6 +627,7 @@ const applyChageCover = async () => {
   const canvas = cropperCoverRef.value.getResult().canvas
   const cover = canvas.toDataURL('image/jpeg', 0.9)
   await profileStore.uploadCoverBase64(cover)
+  imgCacheBust.value = Date.now()
   editCover.value = false
   uploadedImage.value = null
 }
@@ -609,16 +635,18 @@ const applyChageCover = async () => {
 const handleDeleteCover = async () => {
   editCover.value = false
   await profileStore.removeCover()
+  imgCacheBust.value = Date.now()
   if (!profileStore.isProcessing) deleteCover.value = false
 }
 
 const handleAvatarDelete = async () => {
-  if (uploadedImage.value == null) {
-    showWarning("You can't delete default image")
+  if (!profileStore.user?.avatar) {
+    showWarning("You don't have a profile photo to remove")
     return
   }
   showImageCropper.value = false
   await profileStore.removeAvatar()
+  imgCacheBust.value = Date.now()
   if (!profileStore.isProcessing) deleteAvatar.value = false
 }
 
@@ -658,6 +686,14 @@ const formatFileSize = (bytes) => {
   if (bytes < 1024) return bytes + ' B'
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB'
   return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
+}
+
+function openEditAvatar() {
+  // Do NOT pre-load the remote avatar URL into the cropper.
+  // Remote URLs fail to load in the cropper due to CORS.
+  // Instead we show the current avatar as a preview in the placeholder.
+  uploadedImage.value = null
+  showImageCropper.value = true
 }
 
 function openEditCover() {
@@ -1186,9 +1222,52 @@ defineExpose({
   color: var(--color-text);
 }
 
-.placeholder-text .sub-msg {
+.placeholder-text .sub-msg,
+.sub-msg {
   font-size: 0.85rem;
   color: var(--color-muted);
+}
+
+/* Current avatar preview inside modal */
+.current-avatar-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.current-avatar-img {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--color-primary);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.placeholder-icon-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Current cover preview inside modal */
+.current-cover-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.current-cover-img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 3px solid var(--color-primary);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .modal-actions {
