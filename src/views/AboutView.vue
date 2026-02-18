@@ -22,19 +22,9 @@
               Communication
             </h1>
             <p class="hero-description reveal-scroll reveal-up" style="transition-delay: 0.2s">
-              Next Gen brings teams together with powerful, intuitive communication tools
+              Vetika brings teams together with powerful, intuitive communication tools
               built for the modern web. Experience innovation like never before.
             </p>
-            <!-- <div class="hero-buttons reveal-scroll reveal-up" style="transition-delay: 0.3s">
-              <button class="btn btn-primary">
-                Start Next Gen
-                <i class="bi bi-arrow-right ms-2"></i>
-              </button>
-              <button class="btn btn-outline">
-                <i class="bi bi-play-circle me-2"></i>
-                Watch Demo
-              </button>
-            </div> -->
           </div>
           <div class="col-lg-6">
             <div class="hero-visual reveal-scroll reveal-scale">
@@ -82,7 +72,7 @@
             <h2 class="section-title">Building the Future of Communication</h2>
             <div class="about-content">
               <p>
-                Founded in 2026, Next Gen emerged from a simple belief: communication should be
+                Founded in 2026, Vetika emerged from a simple belief: communication should be
                 effortless, secure, and accessible to everyone. What started as a small project by a
                 team of passionate developers has grown into a platform trusted by millions
                 worldwide.
@@ -136,7 +126,7 @@
             <div class="section-label">Technology</div>
             <h2 class="section-title">Built on Cutting-Edge Innovation</h2>
             <p class="tech-lead">
-              Next Gen leverages the latest advancements in cloud infrastructure, real-time
+              Vetika leverages the latest advancements in cloud infrastructure, real-time
               protocols, and AI-driven features to deliver an unmatched communication experience.
             </p>
             <ul class="tech-list">
@@ -161,7 +151,7 @@
       <div class="container-fluid px-4">
         <div class="section-header text-center">
           <div class="section-label">Our Team</div>
-          <h2 class="section-title">Meet the People Behind Next Gen</h2>
+          <h2 class="section-title">Meet the People Behind Vetika</h2>
           <p class="section-description">
             Passionate individuals dedicated to building the future of communication platforms
           </p>
