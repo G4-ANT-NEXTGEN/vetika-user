@@ -127,7 +127,7 @@ watch(() => postStore.search, () => {
   if (timeout) clearTimeout(timeout)
   timeout = setTimeout(() => {
     postStore.fetchPosts()
-  }, 500)
+  }, 100)
 })
 
 authStore.fetchProfile()

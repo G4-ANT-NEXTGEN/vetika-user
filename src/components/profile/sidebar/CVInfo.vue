@@ -191,7 +191,7 @@
             </div>
             <div class="upload-text">
               <span class="primary-text light-dark ">Drop your CV here or click to browse</span>
-              <span class="secondary-text">PDF files only • Max 10MB</span>
+              <span class="secondary-text">PDF files only • Max 3MB</span>
             </div>
           </label>
         </div>
@@ -303,6 +303,7 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import { useProfileStore } from '@/stores/profile'
 import BaseButton from '@/components/ui/base/BaseButton.vue'
+import { showError } from '@/utils/toast'
 
 const profileStore = useProfileStore()
 const showModal = ref(false)
@@ -373,11 +374,14 @@ const cvOnChangeFile = (e) => {
   const file = e.target.files[0]
   if (!file) return
   if (file.type !== 'application/pdf') {
-    alert('Only PDF files are allowed')
+    showError('Only PDF files are allowed')
+    e.target.value = ''
     return
   }
-  if (file.size > 10 * 1024 * 1024) {
-    alert('File size must be less than 10MB')
+  const maxSize = 3072 * 1024; // 3072 KB
+  if (file.size > maxSize) {
+    showError('File size exceeds 3072 KB. Please upload a smaller file.')
+    e.target.value = ''
     return
   }
   cvFile.value = file
@@ -968,20 +972,17 @@ onMounted(async () => {
   align-items: center;
   gap: 12px;
   padding: 14px 32px;
-  background: linear-gradient(135deg, var(--color-primary) 0%, #3b82f6 100%);
-  color: white;
+  background: var(--color-text);
+  color: var(--color-background);
   border: none;
   border-radius: 16px;
   font-weight: 700;
   font-size: 15px;
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
 }
 
 .upload-btn-premium:hover {
-  transform: translateY(-5px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(59, 130, 246, 0.4);
   filter: brightness(1.1);
 }
 

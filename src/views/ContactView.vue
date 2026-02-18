@@ -73,7 +73,7 @@
                 <!-- Info Cards -->
                 <div class="info-card p-4 rounded-4">
                   <div class="d-flex align-items-center gap-4">
-                    <div class="icon-circle text-white">
+                    <div class="icon-circle light-dark">
                       <i class="bi bi-geo-alt-fill"></i>
                     </div>
                     <div>
@@ -88,7 +88,7 @@
 
                 <div class="info-card p-4 rounded-4">
                   <div class="d-flex align-items-center gap-4">
-                    <div class="icon-circle text-white">
+                    <div class="icon-circle light-dark">
                       <i class="bi bi-envelope-fill"></i>
                     </div>
                     <div>
@@ -157,6 +157,15 @@ defineOptions({
 </script>
 
 <style scoped>
+
+input::placeholder {
+  color: var(--input-placeholder);
+}
+
+textarea::placeholder {
+  color: var(--input-placeholder);
+}
+
 .contact-page {
   color: var(--color-text);
   min-height: 100%;

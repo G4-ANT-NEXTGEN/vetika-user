@@ -19,6 +19,7 @@ export const useAuthStore = defineStore('auth', () => {
     passwordForget.value = ''
     confirmPasswordForget.value = ''
   }
+
   const registrationForm = ref({
     full_name: '',
     email: '',
@@ -81,8 +82,7 @@ export const useAuthStore = defineStore('auth', () => {
   const logout = async () => {
     try {
       await api.delete('/api/login')
-      showSuccess('Logout successful')
-
+      // showSuccess('Logout successful')
     } catch (error) {
       console.error('Logout failed:', error)
       showError('Logout failed')

@@ -1,6 +1,9 @@
 <template>
   <div class="mb-3 position-relative">
-    <label :for="id" v-if="label" class="form-label">{{ label }}</label>
+    <label :for="id" v-if="label" class="form-label">
+      {{ label }}
+      <span v-if="required" class="required-mark">*</span>
+    </label>
 
     <div class="input-group-custom">
       <!-- Use Flatpickr for date inputs -->
@@ -85,6 +88,14 @@ const handleDateChange = (selectedDates, dateStr) => {
   font-weight: 600;
   color: var(--color-text);
   margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.required-mark {
+  color: var(--color-danger);
+  margin-left: 4px;
+  font-size: 16px;
 }
 
 .form-control {

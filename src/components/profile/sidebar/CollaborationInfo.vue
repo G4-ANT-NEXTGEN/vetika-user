@@ -91,7 +91,6 @@ const onAddCollaboration = () => {
   emit('open-collab')
 }
 
-
 </script>
 
 <style scoped>

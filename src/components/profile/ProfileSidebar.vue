@@ -93,15 +93,15 @@
       <div class="row g-3">
         <div class="col-md-6">
           <BaseInput label="Full Name" placeholder="Enter Your Full Name" v-model="full_name" @input="validateFullName"
-            :error="errors.full_name" />
+            :error="errors.full_name" :required="true" />
         </div>
         <div class="col-md-6">
           <BaseInput label="Email" placeholder="Enter Your Email" v-model="email" type="email" @input="validateEmail"
-            :error="errors.email" />
+            :error="errors.email" :required="true" />
         </div>
         <div class="col-md-6">
           <BaseInput type="number" label="Phone" placeholder="Enter Your Phone Number" v-model="phone"
-            @input="validatePhone" :error="errors.phone" />
+            @input="validatePhone" :error="errors.phone" :required="true" />
         </div>
         <div class="col-md-6">
           <BaseInput label="Date of Birth" type="date" placeholder="Enter Your Date of Birth" v-model="DOB" />

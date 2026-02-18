@@ -79,7 +79,8 @@
             placeholder="What's on your mind?" @input="validateTitle"></textarea>
           <div v-if="errorTitle" class="invalid-feedback d-block">{{ errorTitle }}</div>
           <small v-if="titlePost" class="text-color d-block mt-2">{{ titlePost.length }}/500
-            characters</small>
+            characters
+          </small>
         </div>
         <div class="category-selection">
           <p class="text-category fw-semibold">Select Category</p>
@@ -137,7 +138,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, nextTick } from 'vue';
+import { useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { usePostStore } from '@/stores/post';
 import { useCategoryStore } from '@/stores/category';
@@ -145,6 +147,7 @@ import { useRequiredValidator } from '@/composables/useRequiredValidator';
 import ArticleCard from '@/components/common/ArticleCard.vue';
 import ArticleCardSkeleton from '@/components/common/ArticleCardSkeleton.vue';
 import NoData from '@/components/common/NoData.vue';
+import { showError } from '@/utils/toast';
 
 const authStore = useAuthStore();
 const categoryStore = useCategoryStore();
@@ -179,9 +182,34 @@ const visiblePosts = computed(() => {
 
 
 
-authStore.fetchProfile();
-postStore.fetchPosts();
-categoryStore.fetchCategorys();
+const route = useRoute();
+
+onMounted(async () => {
+  isLoading.value = true;
+  await Promise.all([
+    authStore.fetchProfile(),
+    postStore.fetchPosts(),
+    categoryStore.fetchCategorys(),
+  ]);
+  isLoading.value = false;
+
+  // Handle deep linking to specific post
+  if (route.hash) {
+    await nextTick();
+    // Use a small timeout to ensure the DOM is fully updated and layout is stable
+    setTimeout(() => {
+      const element = document.querySelector(route.hash);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Optional: add a highlight class if you want
+        element.classList.add('highlight-post');
+        setTimeout(() => {
+          element.classList.remove('highlight-post');
+        }, 3000);
+      }
+    }, 500);
+  }
+});
 
 const GetpostId = (id) => {
   PostId.value = id;
@@ -246,14 +274,32 @@ const openAttachmentPicker = () => {
 };
 
 const handleFileChange = (event) => {
-  file.value = event.target.files[0];
-  if (file.value) {
-    imgPost.value = URL.createObjectURL(file.value);
+  const selectedFile = event.target.files[0];
+  if (!selectedFile) return;
+
+  const maxSize = 3072 * 1024; // 3072 KB in bytes
+  if (selectedFile.size > maxSize) {
+    showError('File size exceeds 3072 KB. Please upload a smaller image.');
+    event.target.value = '';
+    return;
   }
+
+  file.value = selectedFile;
+  imgPost.value = URL.createObjectURL(file.value);
 };
 
 const handleAttachmentChange = (event) => {
-  attachment.value = event.target.files[0];
+  const selectedFile = event.target.files[0];
+  if (!selectedFile) return;
+
+  const maxSize = 3072 * 1024; // 3072 KB in bytes
+  if (selectedFile.size > maxSize) {
+    showError('Attachment size exceeds 3072 KB. Please upload a smaller file.');
+    event.target.value = '';
+    return;
+  }
+
+  attachment.value = selectedFile;
 };
 
 const openCreatePostModal = () => {

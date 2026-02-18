@@ -87,26 +87,26 @@
         <div class="mb-4">
           <BaseSelect v-model="school" label="School / University" placeholder="Search school..."
             :options="schoolStore.schools.map((s) => ({ value: s.id, label: s.name }))" :error="errors.school"
-            @change="validateSchool" />
+            @change="validateSchool" :required="true" />
         </div>
 
         <div class="row g-3 mb-4">
           <div class="col-md-6">
             <BaseSelect v-model="degree" label="Degree" placeholder="Select degree"
               :options="degreeStore.degrees.map((d) => ({ value: d.id, label: d.name }))" :error="errors.degree"
-              @change="validateDegree" />
+              @change="validateDegree" :required="true" />
           </div>
           <div class="col-md-6">
             <BaseSelect v-model="subject" label="Field of Study" placeholder="Select subject"
               :options="subjectStore.subjects.map((s) => ({ value: s.id, label: s.name }))" :error="errors.subject"
-              @change="validateSubject" />
+              @change="validateSubject" :required="true" />
           </div>
         </div>
 
         <div class="row g-3 mb-4">
           <div class="col-md-6">
             <BaseInput type="date" label="Start Date" placeholder="YYYY-MM" v-model="start_date"
-              :error="errors.start_date" @input="validateStartDate" />
+              :error="errors.start_date" @input="validateStartDate" :required="true" />
           </div>
           <div class="col-md-6">
             <BaseInput type="date" label="End Date" placeholder="YYYY-MM or Present" v-model="end_date" />
@@ -327,10 +327,10 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-
 textarea::placeholder {
   color: var(--input-placeholder);
 }
+
 .education-list {
   display: flex;
   flex-direction: column;

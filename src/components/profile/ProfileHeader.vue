@@ -66,7 +66,7 @@
             </div>
             <div class="upload-text">
               <span class="primary-text light-dark">Drop your CV here or click to browse</span>
-              <span class="secondary-text light-dark">PDF files only • Max 10MB</span>
+              <span class="secondary-text light-dark">PDF files only • Max 3MB</span>
             </div>
           </label>
         </div>
@@ -102,7 +102,10 @@
         <div class="form-group">
           <div class="d-flex justify-content-between">
 
-            <label class="form-label">Company Logo</label>
+            <label class="form-label">
+              Company Logo
+              <span class="required-mark">*</span>
+            </label>
             <p v-if="companyLogoPreview" v-tippy="'click to cancel image'"
               @click="companyLogo = null; companyLogoPreview = null" style="cursor: pointer;">
               <i class="fs-4 bi bi-x-circle light-dark"></i>
@@ -124,7 +127,7 @@
           </div>
         </div>
         <BaseInput label="Company Website" placeholder="https://example.com" @input="validateCompanyLink"
-          :error="errors.companyLink" v-model="companyLink" />
+          :error="errors.companyLink" v-model="companyLink" :required="true" />
       </div>
 
       <template #footer>
@@ -245,7 +248,7 @@
               </div>
               <div class="placeholder-text">
                 <span class="main-msg">Select an image to crop</span>
-                <span class="sub-msg">PNG, JPG or GIF up to 10MB</span>
+                <span class="sub-msg">PNG, JPG or GIF up to 3MB</span>
               </div>
             </div>
           </div>
@@ -288,7 +291,7 @@
               </div>
               <div class="placeholder-text">
                 <span class="main-msg">Select a photo to crop</span>
-                <span class="sub-msg">PNG or JPG up to 5MB</span>
+                <span class="sub-msg">PNG or JPG up to 3MB</span>
               </div>
             </div>
           </div>
@@ -544,17 +547,32 @@ const validateForm = () => {
   return isValid
 }
 const handleFileSelect = (e) => {
-  const file = e.target.files[0]
-  if (!file) return
+  const selectedFile = e.target.files[0]
+  if (!selectedFile) return
+
+  const maxSize = 3072 * 1024; // 3072 KB
+  if (selectedFile.size > maxSize) {
+    showError('File size exceeds 3072 KB. Please upload a smaller image.')
+    e.target.value = ''
+    return
+  }
 
   const reader = new FileReader()
   reader.onload = (ev) => (uploadedImage.value = ev.target.result)
-  reader.readAsDataURL(file)
+  reader.readAsDataURL(selectedFile)
 }
 const CompanyLogoSelect = (e) => {
   const logo = e.target.files[0]
   if (!logo)
     return false
+
+  const maxSize = 3072 * 1024; // 3072 KB
+  if (logo.size > maxSize) {
+    showError('Logo size exceeds 3072 KB. Please upload a smaller image.')
+    e.target.value = ''
+    return false
+  }
+
   companyLogo.value = logo
   errors.companyLogo = '' // Clear logo error when selected
   const reader = new FileReader()
@@ -608,11 +626,14 @@ const cvOnChangeFile = (e) => {
   const cv = e.target.files[0]
   if (!cv) return
   if (cv.type !== 'application/pdf') {
-    alert('Only PDF files are allowed')
+    showError('Only PDF files are allowed')
+    e.target.value = ''
     return
   }
-  if (cv.size > 10 * 1024 * 1024) {
-    alert('File size must be less than 10MB')
+  const maxSize = 3072 * 1024; // 3072 KB
+  if (cv.size > maxSize) {
+    showError('CV size exceeds 3072 KB. Please upload a smaller file.')
+    e.target.value = ''
     return
   }
   cvFile.value = cv
@@ -1397,6 +1418,11 @@ defineExpose({
   flex-direction: column;
   gap: 20px;
   padding: 8px 0;
+}
+
+.required-mark {
+  color: var(--color-danger);
+  margin-left: 4px;
 }
 
 .form-group {

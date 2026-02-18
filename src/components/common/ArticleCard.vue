@@ -23,20 +23,20 @@
         </div>
       </div>
 
-      <div class="post-actions" v-if="post.creator.id == currentUserId">
-        <button @click="$emit('get-id', post.id)" class="action-trigger" type="button" data-bs-toggle="dropdown"
+      <div class="post-actions" v-if="post.creator && post.creator.id == currentUserId">
+        <button @click="emit('get-id', post.id)" class="action-trigger" type="button" data-bs-toggle="dropdown"
           aria-expanded="false">
           <i class="bi bi-three-dots"></i>
         </button>
         <ul class="action-dropdown dropdown-menu">
           <li>
-            <button @click="$emit('edit', post.id)" type="button" class="action-item">
+            <button @click="emit('edit', post.id)" type="button" class="action-item">
               <i class="bi bi-pencil"></i>
               <span>Edit Post</span>
             </button>
           </li>
           <li>
-            <button @click="$emit('delete', post.id)" type="button" class="action-item action-item--danger">
+            <button @click="emit('delete', post.id)" type="button" class="action-item action-item--danger">
               <i class="bi bi-trash"></i>
               <span>Delete Post</span>
             </button>
@@ -53,7 +53,10 @@
 
     <!-- Content Section -->
     <div class="post-content">
-      <p class="post-text">{{ post.text }}</p>
+      <p ref="textRef" class="post-text" :class="{ 'is-clamped': !isExpanded }">{{ post.text }}</p>
+      <button v-if="shouldShowReadMore" @click="isExpanded = !isExpanded" class="read-more-btn">
+        {{ isExpanded ? 'See Less' : 'See More' }}
+      </button>
     </div>
 
     <!-- Image Section -->
@@ -93,7 +96,7 @@
     <!-- Footer Actions -->
     <footer class="post-footer">
       <div class="engagement-actions">
-        <button @click="$emit('like', post.id)" class="action-btn" :class="{ 'is-active': isLiked }">
+        <button @click="emit('like', post.id)" class="action-btn" :class="{ 'is-active': isLiked }">
           <i v-if="isLiked" class="bi bi-heart-fill"></i>
           <i v-else class="bi bi-heart"></i>
           <span class="action-label">Like</span>
@@ -143,13 +146,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onBeforeUnmount } from 'vue';
-import router from '@/router'
+import { ref, computed, onBeforeUnmount, onMounted, nextTick, watch } from 'vue';
+import { useRouter } from 'vue-router'
 import moment from 'moment-timezone'
 import { showError, showSuccess } from '@/utils/toast'
-
-const showPreview = ref(false);
-const isShareOpen = ref(false);
 
 const props = defineProps({
   post: {
@@ -170,7 +170,26 @@ const props = defineProps({
   },
 })
 
-defineEmits(['edit', 'delete', 'like', 'get-id', 'hide'])
+const emit = defineEmits(['edit', 'delete', 'like', 'get-id', 'hide'])
+const router = useRouter()
+
+const showPreview = ref(false);
+const isShareOpen = ref(false);
+const isExpanded = ref(false);
+const shouldShowReadMore = ref(false);
+const textRef = ref(null);
+
+const checkOverflow = async () => {
+  await nextTick();
+  if (textRef.value) {
+    const element = textRef.value;
+    shouldShowReadMore.value = element.scrollHeight > element.clientHeight;
+  }
+};
+
+onMounted(checkOverflow);
+
+watch(() => props.post?.text, checkOverflow);
 
 const formatDate = (date) => {
   if (!date) return ''
@@ -481,6 +500,32 @@ const copyShareLink = async () => {
   margin: 0;
   white-space: pre-wrap;
   word-break: break-word;
+  transition: all 0.3s ease;
+}
+
+.post-text.is-clamped {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.read-more-btn {
+  background: none;
+  border: none;
+  color: var(--color-primary, #3b82f6);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 4px 0;
+  margin-top: 4px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.read-more-btn:hover {
+  color: var(--color-primary-dark, #2563eb);
+  text-decoration: underline;
 }
 
 /* Media Section */
@@ -808,5 +853,27 @@ const copyShareLink = async () => {
 .scale-leave-to {
   opacity: 0;
   transform: scale(0.9);
+}
+
+/* Highlight Targeted Post */
+.post-card.highlight-post {
+  animation: highlight-pulse 2s ease-out;
+  border-color: var(--color-primary) !important;
+}
+
+@keyframes highlight-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--color-primary-rgb), 0.4);
+    transform: scale(1.02);
+  }
+
+  70% {
+    box-shadow: 0 0 0 15px rgba(var(--color-primary-rgb), 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--color-primary-rgb), 0);
+    transform: scale(1);
+  }
 }
 </style>

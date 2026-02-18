@@ -277,7 +277,6 @@ export const useProfileStore = defineStore('profile', () => {
       isDeletingAccount.value = true
       isLoading.value = true
       await api.delete(`/api/profile/delete-acc`)
-      showSuccess('Delete Account Successful')
       authStore.clearAuth()
       router.push({ name: 'landing' })
     } catch (e) {
