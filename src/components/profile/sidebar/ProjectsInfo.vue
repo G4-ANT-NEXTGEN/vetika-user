@@ -78,10 +78,10 @@
       @close="closeProjectUpdate">
       <div class="p-3">
         <BaseInput label="Project Title" v-model="projectTitle" placeholder="Enter project title" :error="errors.title"
-          @input="validateTitle" />
+          @input="validateTitle" :required="true" />
         <div class="mt-4">
           <BaseInput label="Project Link" v-model="projectLink" placeholder="https://your-project.com"
-            :error="errors.link" @input="validateLink" />
+            :error="errors.link" @input="validateLink" :required="true" />
           <p class="form-hint mt-1 small light-dark">
             <i class="bi bi-info-circle me-1"></i>
             Provide a link to the live project, repository, or case study.

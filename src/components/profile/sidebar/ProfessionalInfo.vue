@@ -78,11 +78,11 @@
         <div class="row g-3 mb-3">
           <div class="col-md-6">
             <BaseInput label="Job Title" placeholder="e.g. Senior Product Designer" v-model="form.job_title"
-              :error="errors.job_title" @input="validateJobTitle" />
+              :error="errors.job_title" @input="validateJobTitle" :required="true" />
           </div>
           <div class="col-md-6">
             <BaseInput label="Company Name" placeholder="e.g. Acme Corporation" v-model="form.company_name"
-              :error="errors.company_name" @input="validateCompanyName" />
+              :error="errors.company_name" @input="validateCompanyName" :required="true" />
           </div>
         </div>
         <div class="mb-0">

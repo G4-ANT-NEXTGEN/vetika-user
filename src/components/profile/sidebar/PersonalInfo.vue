@@ -120,6 +120,7 @@ import ArticleCard from '@/components/common/ArticleCard.vue'
 import NoData from '@/components/common/NoData.vue'
 import BaseButton from '@/components/ui/base/BaseButton.vue'
 import BaseModal from '@/components/ui/base/BaseModal.vue'
+import { showError } from '@/utils/toast'
 
 const profileStore = useProfileStore()
 const authStore = useAuthStore()
@@ -249,12 +250,32 @@ const openAttachmentPicker = () => {
 }
 
 const handleFileChange = (event) => {
-  file.value = event.target.files[0]
-  if (file.value) imgPost.value = URL.createObjectURL(file.value)
+  const selectedFile = event.target.files[0]
+  if (!selectedFile) return
+
+  const maxSize = 3072 * 1024; // 3072 KB
+  if (selectedFile.size > maxSize) {
+    showError('File size exceeds 3072 KB. Please upload a smaller image.')
+    event.target.value = ''
+    return
+  }
+
+  file.value = selectedFile
+  imgPost.value = URL.createObjectURL(file.value)
 }
 
 const handleAttachmentChange = (event) => {
-  attachment.value = event.target.files[0]
+  const selectedFile = event.target.files[0]
+  if (!selectedFile) return
+
+  const maxSize = 3072 * 1024; // 3072 KB
+  if (selectedFile.size > maxSize) {
+    showError('Attachment size exceeds 3072 KB. Please upload a smaller file.')
+    event.target.value = ''
+    return
+  }
+
+  attachment.value = selectedFile
 }
 
 const removeImage = () => {
